@@ -1,0 +1,67 @@
+#Seguam 2011, stratum 4 ONLY; ignoring the inside release of tags for this file
+.3
+#recovery events
+9
+# tagged; column = both sexes
+5803
+#fish examined for tags; rows = recovery events; column = no inside/outside
+#recovery evenets: fishery 1, fishery 2, charter 2, fishery 3, fishery 4, fishery 5, charter 5, fishery 6, fishery 7
+3846134
+2438460
+848699
+19111437
+14235300
+1539466
+1011858
+8718581
+15731747
+#tag recoveries; rows = recovery events; columns = no inside/outside; tag recoveries include double tagged fish
+87
+20
+13
+118
+59
+7
+10
+43
+74
+#report rate codes; rows - recovery events; columns = no inside/outside
+1
+1
+2
+1
+1
+1
+2
+1
+1
+#days since tagging event; rows=recovery events, first row is tagging to first recovery event
+46
+49
+49
+36
+149
+8
+8
+108
+130
+# 46 95 95 131 280 288 288 396 526
+# tag retention; columns = # dbl-tag rec w/both tags, # w/one tag
+100 17
+#proportion double-tagged; columns = no inside/outside
+0.24
+#survival experiments, 2011 only; columns=#survived, #died
+265 16 
+#number of reporting rate trials (vessel=trial); columns=commercial, charter
+6 1
+#reporting rate data; rows=vessels (commercial first, charter last row); columns=#reported, #not reported; all tags
+#is not area specific, includes seeded tags from any area during the fishery
+242 88
+48 13
+128 24
+228 55
+311 96
+317 32
+1220 36
+# Check
+12345
