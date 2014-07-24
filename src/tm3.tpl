@@ -21,6 +21,9 @@
   init_number M_in;
   init_number M_cv;
   init_int M_phase;
+  number lambda_M;
+  !! lambda_M = 1/(2.*M_cv*M_cv);
+  init_number MeanWt;
   init_int n_events
   init_number T;
   init_vector C(1,n_events);
@@ -119,7 +122,7 @@ INITIALIZATION_SECTION
 
 PARAMETER_SECTION
   init_number lnNinit(1);
-  init_number lnM(-3);
+  init_number lnM(M_phase);
   init_bounded_number ploss(0,1);
   init_bounded_number surv(0,1,2);
   init_bounded_vector repr(1,n_events,0.05,1,1);
@@ -134,6 +137,7 @@ PARAMETER_SECTION
   vector fcomp(1,6);
   sdreport_number M;
   sdreport_number Ninit;
+  sdreport_number Biomass;
   // Reporting rates for commercial and charter
   sdreport_vector RepRate(1,2);
   objective_function_value f
@@ -161,12 +165,14 @@ PROCEDURE_SECTION
       nRepRate(repindex(i))++;
     }
     RepRate = elem_div(RepRate,nRepRate);
+    Biomass = Ninit*MeanWt;
+    ER      = sum(C)/mean(N);
   }
   if(mceval_phase())
   {
     if (mcflag)
     {
-      mout<<Ninit<<" "<<ploss<<" "<<RepRate<<" "<<M<<" "<<ER<<" "<<surv<<" "<<f<<" "<<fcomp<<endl;
+      mout<<Biomass<<" "<< Ninit<<" "<<ploss<<" "<<RepRate<<" "<<M<<" "<<ER<<" "<<surv<<" "<<f<<" "<<fcomp<<endl;
     }
     else
     {
@@ -180,13 +186,11 @@ FUNCTION do_dynamics
   for (i=1; i<=n_events; i++)
   {
     N(i) = N(i-1)*mfexp(-ndays(i)*M/365.);
-    dvariable kc;  
-    kc           = C(i);
-    ER           = kc/N(i);
-    dvariable sr = 1.-ER;
-    if(sr< 0.01) { ffpen    = 0.; dvariable  kludge; kludge   = posfun(sr,0.01,ffpen); kc       = (1.-kludge)*N(i); ER       = 1.-kludge; cout <<" Exceeded population with the catch... "<< kludge<<" "<<C(i)<<" "<<N(i)<<endl; fcomp(6)+= 1e6*ffpen; }
-    N(i)        -= kc;                                     // subtract off catch from remaining stock
-    pred_tags(i) = Tags(i-1)*ER*mfexp(-ndays(i)*M/365.);   // predicted tags a function of ER and previous tag numbers
+    dvariable ERtmp   = C(i)/(N(i));
+    dvariable sr = 1.-ERtmp;
+    if(sr< 0.01) { ffpen    = 0.; dvariable  kludge; kludge   = posfun(sr,0.01,ffpen); ERtmp    = 1.-kludge; cout <<" Exceeded population with the catch... "<< kludge<<" "<<C(i)<<" "<<N(i)<<endl; fcomp(6)+= 1e6*ffpen; }
+    N(i)        -= C(i);                                     // subtract off catch from remaining stock
+    pred_tags(i) = Tags(i-1)*ERtmp*mfexp(-ndays(i)*M/365.);   // predicted tags a function of ER and previous tag numbers
     Tags(i)      = Tags(i-1) - pred_tags(i);               // subtract off catch from remaining stock
   }
 
@@ -214,8 +218,7 @@ FUNCTION void get_likelihoods()
   */
 // Jim's addition to objective function that penalizes movements being different into and out of the area
 // option to change penalty in different phases... this can be useful to detect local minima
-  fcomp(3)  = 12.5*square(lnM);
-  fcomp(3) += 12.5*square(lnM);
+  fcomp(3)  = lambda_M*square(lnM);
 
   f=sum(fcomp);
 
@@ -253,24 +256,27 @@ REPORT_SECTION
   report<<"F "<<endl<<f<<" "<<fcomp<<endl;
   report<< "Ninit"<<endl;
   report<< Ninit  <<endl;
-  report<< "Obs_Tags Pred_Tags "<<endl;
-  for (ii=1; ii<=n_events; ii++)  report<<obs_tags(ii)<<" "<<pred_tags(ii)<<endl;
+  report<< "Biomass"<<endl;
+  report<< Biomass  <<endl;
+  report<< "Obs_Tags"<<endl;
+  report <<obs_tags<<endl;
+  report<< "Pred_Tags "<<endl;
+  report <<pred_tags<<endl;
    // for (ii=1; ii<=n_events; ii++)  report<<obs_tags(ii,1)<<" "<<obs_tags(ii,2)<<endl;
   report<< "ploss"<<endl;
   report<<ploss<<endl;
-  report<< "ER"<<endl;
+  // report<< "ER"<<endl;
   // report<<sum(C)/sum(N(0))<<endl;
   report<< "N"<<endl;
   report<<N<<endl;
-  report<<" prob no tag "<<prob_no_tag<<endl;
-  report<<" surv "<<surv<<endl;
-  report<<" rep rate "<<repr<<endl;
+  report<<"prob_no_tag "<<prob_no_tag<<endl;
+  report<<"surv "<<surv<<endl;
+  report<<" rep_rate "<<repr<<endl;
   // report<<" prob move "<<pmove<<endl;
-  for (i=0; i<=n_events; i++)
+  /* for (i=0; i<=n_events; i++)
   {
      report<<i<<" "<<Tags(i)<<" "<<Tags(i)<<endl;
   }
-  /*
   if (last_phase())
   {
     ofstream ofs("tag.out",ios::app);
