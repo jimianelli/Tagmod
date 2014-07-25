@@ -273,9 +273,12 @@ REPORT_SECTION
   report<<"surv "<<surv<<endl;
   report<<" rep_rate "<<repr<<endl;
   report<<"DaysElapsed"<<endl;
-  double icnt=ndays(1);
-  for (int i=2;i<=n_events;i++)
-    report<<ndays(i)<<endl;
+  double dcnt=0.;
+  for (int i=1;i<=n_events;i++)
+  {
+    dcnt+=ndays(i);
+    report<<dcnt<<endl;
+  }
   // report<<" prob move "<<pmove<<endl;
   /* for (i=0; i<=n_events; i++)
   {
