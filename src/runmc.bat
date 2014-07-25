@@ -1,4 +1,6 @@
+
 if NOT EXIST arc mkdir arc 
+
 echo ..\data\%1.dat > tm3.dat 
 tm3 -mcmc 1000000 -mcsave 200
 tm3 -mceval
