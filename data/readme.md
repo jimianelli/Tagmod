@@ -15,6 +15,8 @@ seg_all_s1 :: constrained M
 seg_all_s2 :: M free
 seg_all_s3 :: seafisher excluded in event 8 for reporting rate
 seg_all_s4 :: Only 1 commercial and 1 charter reporting rate
+seg_all_s5 :: seafisher excluded in event 8 AND free M
+
 ### Using only data from 2011
 seg_011   
 
