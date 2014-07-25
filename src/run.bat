@@ -1,4 +1,4 @@
-if NOT EXIST mkdir arc 
+if NOT EXIST arc mkdir arc 
 echo ..\data\%1.dat > tm3.dat 
 tm3 -nox
 copy tm3.std arc\%1.std
