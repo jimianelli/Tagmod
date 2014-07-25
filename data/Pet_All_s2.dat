@@ -1,0 +1,71 @@
+# Petrel 2011-2012, no defined area, all stratum 1
+# Natural mortality
+# Mean   CV  Phase(neg turns off)
+  0.3   3.2    3
+# Average weight of released Atkas
+0.366
+#recovery events
+9
+# tagged; column = both sexes
+9961
+#fish examined for tags; rows = recovery events; column = no inside/outside
+#recovery evenets: fishery 1, fishery 2, charter 2, fishery 3, fishery 4, fishery 5, charter 5, fishery 6, fishery 7
+4446931
+3688433
+1244519
+7003832
+5963828
+766554
+1252326
+16263525
+1888220
+#tag recoveries; rows = recovery events; columns = no inside/outside; tag recoveries include double tagged fish
+81
+35
+20
+72
+95
+28
+5
+46
+6
+#report rate codes; rows - recovery events; columns = no inside/outside
+1
+1
+2
+1
+1
+1
+2
+1
+1
+#days between events; rows=recovery events, first row is tagging to first recovery event
+46
+49
+0
+36
+149
+8
+0
+108
+130
+# tag retention; columns = # dbl-tag rec w/both tags, # w/one tag
+98 12
+#proportion double-tagged; columns = no inside/outside
+0.24
+#survival experiments, 2011 only; columns=#survived, #died
+265 16 
+#reporting rate data; rows=event 
+# columns=#reported, #not reported; all tags
+# is not area specific, includes seeded tags from any area during the fishery
+660 97 # commercial
+660 97 # commercial
+710 23 # the 1st charter recover experiments
+660 97 # commercial
+247 65 # commercial
+100 40 # commercial
+510 11 # the 2nd charter recover experiments
+219 49 # commercial
+359 100 # commercial
+# Check
+12345

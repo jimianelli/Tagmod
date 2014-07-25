@@ -1,0 +1,46 @@
+# Seguam 2011-2012, no defined area, all stratum 1
+# Natural mortality
+# Mean   CV  Phase(neg turns off)
+  0.3   0.2    3
+# Average weight of released Atkas
+0.818
+#recovery events
+4
+# tagged; column = both sexes
+5803
+#fish examined for tags; rows = recovery events; column = no inside/outside
+#recovery evenets: fishery 1, fishery 2, charter 2, fishery 3, fishery 4, fishery 5, charter 5, fishery 6, fishery 7
+3846134
+2438460
+848699
+19111437
+#tag recoveries; rows = recovery events; columns = no inside/outside; tag recoveries include double tagged fish
+88
+20
+13
+120
+#report rate codes; rows - recovery events; columns = no inside/outside
+1
+1
+2
+1
+#days between events; rows=recovery events, first row is tagging to first recovery event
+46
+49
+0
+36
+# tag retention; columns = # dbl-tag rec w/both tags, # w/one tag
+58  4
+#proportion double-tagged; columns = no inside/outside
+0.24
+#survival experiments, 2011 only; columns=#survived, #died
+265 16 
+#reporting rate data; rows=event 
+# columns=#reported, #not reported; all tags
+# is not area specific, includes seeded tags from any area during the fishery
+660 97 # commercial
+660 97 # commercial
+710 23 # the 1st charter recover experiments
+660 97 # commercial
+# Check
+12345

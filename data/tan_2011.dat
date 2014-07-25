@@ -1,0 +1,43 @@
+# this file is space-delimited
+0.3
+#tanaga 2011, no defined area, all stratum 1
+#recovery events
+3
+# tagged; column = both sexes
+5820
+#fish examined for tags; rows = recovery events; column = no inside/outside
+#recovery evenets: fishery 1, fishery 2, charter 2, fishery 3, fishery 4, fishery 5, charter 5, fishery 6, fishery 7
+100840
+557681
+26040
+#tag recoveries; rows = recovery events; columns = no inside/outside; tag recoveries include double tagged fish
+20
+83
+3
+#report rate codes; rows - recovery events; columns = no inside/outside
+1
+2
+1
+#days between events; rows=recovery events, first row is tagging to first recovery event
+46
+95
+131
+# tag retention; columns = # dbl-tag rec w/both tags, # w/one tag
+98 12
+#proportion double-tagged; columns = no inside/outside
+0.23
+#survival experiments, 2011 only; columns=#survived, #died
+265 16 
+#number of reporting rate trials (vessel=trial); columns=commercial, charter
+6 1
+#reporting rate data; rows=vessels (commercial first, charter last row); columns=#reported, #not reported; all tags
+#is not area specific, includes seeded tags from any area during the fishery
+242 88
+48 13
+128 24
+228 55
+311 96
+317 32
+1220 36
+# Check
+12345

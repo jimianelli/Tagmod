@@ -272,6 +272,10 @@ REPORT_SECTION
   report<<"prob_no_tag "<<prob_no_tag<<endl;
   report<<"surv "<<surv<<endl;
   report<<" rep_rate "<<repr<<endl;
+  report<<"DaysElapsed"<<endl;
+  double icnt=ndays(1);
+  for (int i=2;i<=n_events;i++)
+    report<<ndays(i)<<endl;
   // report<<" prob move "<<pmove<<endl;
   /* for (i=0; i<=n_events; i++)
   {
