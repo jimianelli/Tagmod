@@ -1,7 +1,10 @@
 # Seguam 2011-2012, no defined area, all stratum 1
 # Natural mortality
 # Mean   CV  Phase(neg turns off)
-  0.3   0.2    3
+  0.3   0.2    -3
+# Recruitment factor
+# CV  Phase(neg turns off)
+  0.2    3
 # Average weight of released Atkas
 0.818
 #recovery events
@@ -89,7 +92,5 @@
 0.2
 0.230769231
 0.278688525
-#Phase for recruit factors (RF)
-3
 # Check
 12345

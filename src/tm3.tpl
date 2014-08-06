@@ -23,6 +23,10 @@
   init_int M_phase;
   number lambda_M;
   !! lambda_M = 1/(2.*M_cv*M_cv);
+  init_number RF_cv;
+  init_int ph_RF;
+  number lambda_RF
+  !! lambda_RF = 1/(2.*RF_cv*RF_cv);
   init_number MeanWt;
   init_int n_events
   // Tag releases
@@ -49,7 +53,6 @@
   !! obs_tags_sex(1) = elem_prod(p_male_rec , obs_tags); obs_tags_sex(2) = obs_tags - obs_tags_sex(1);
   // !! cout <<obs_tags_sex<<endl;exit(1);
 
-  init_int ph_RF;
   init_int icheck;
 
  LOC_CALCS
@@ -106,13 +109,13 @@ PARAMETER_SECTION
   number prob_no_tag;
   matrix N(1,2,0,n_events);
   matrix Tags(1,2,0,n_events);
-  matrix pred_tags(1,2,1,n_events);
+  matrix pred_tags_sex(1,2,1,n_events);
   vector Ntot_Peterson(1,n_events);
   number ER;
   number ffpen
   number movement_penalty
   vector fcomp(1,6);
-  sdreport_number M;
+  number M;
   sdreport_vector Ninit(1,2);
   sdreport_number Biomass;
   // Reporting rates for commercial and charter
@@ -124,7 +127,7 @@ PROCEDURE_SECTION
   Tags.initialize();
   fcomp.initialize();
   prob_no_tag = (1.-prop_double_tagged) * ploss + prop_double_tagged * ploss*ploss;
-  Ninit(1)    = p_male_rel * mfexp(lnNinit);
+  Ninit(1)    = p_male_rel      * mfexp(lnNinit);
   Ninit(2)    = (1.-p_male_rel) * mfexp(lnNinit);
   N(1,0)      = 1.e6*Ninit(1);
   N(2,0)      = 1.e6*Ninit(2);
@@ -177,21 +180,21 @@ FUNCTION do_dynamics
     if(sr< 0.01) { ffpen = 0.; dvariable  kludge; kludge   = posfun(sr,0.01,ffpen); ERtmp    = 1.-kludge; cout <<" Exceeded population with the catch... "<< kludge<<" "<<C(i)<<" "<<N(i)<<endl; fcomp(6)+= 1e6*ffpen; }
     N(1,i)               -= Catch_sex(1,i);                                     // subtract off catch from remaining stock
     N(2,i)               -= Catch_sex(2,i);                                     // subtract off catch from remaining stock
-    pred_tags(1,i)       = Tags(1,i-1)*ERtmp*mfexp(-ndays(i)*M/365.);   // predicted tags a function of ER and previous tag numbers
-    Tags(1,i)            = Tags(1,i-1) - pred_tags(1,i);               // subtract off catch from remaining stock
-    pred_tags(2,i)       = Tags(2,i-1)*ERtmp*mfexp(-ndays(i)*M/365.);   // predicted tags a function of ER and previous tag numbers
-    Tags(2,i)            = Tags(2,i-1) - pred_tags(2,i);               // subtract off catch from remaining stock
+    pred_tags_sex(1,i)   = Tags(1,i-1)*ERtmp*mfexp(-ndays(i)*M/365.);   // predicted tags a function of ER and previous tag numbers
+    Tags(1,i)            = Tags(1,i-1) - pred_tags_sex(1,i);               // subtract off catch from remaining stock
+    pred_tags_sex(2,i)   = Tags(2,i-1)*ERtmp*mfexp(-ndays(i)*M/365.);   // predicted tags a function of ER and previous tag numbers
+    Tags(2,i)            = Tags(2,i-1) - pred_tags_sex(2,i);               // subtract off catch from remaining stock
   }
 
 FUNCTION void get_likelihoods()
   int i,tloc,kk,irf;
   for (i=1; i<=n_events; i++)
   {
-    pred_tags(1,i) *= repr(i);
-    pred_tags(2,i) *= repr(i);
+    pred_tags_sex(1,i) *= repr(i);
+    pred_tags_sex(2,i) *= repr(i);
     // cout<< pred_tags(i,tloc,loc)<<" "<<obs_tags(i,tloc,loc)<<" "<<log(pred_tags(i,tloc,loc));
-    fcomp(1)     += pred_tags(1,i)-(obs_tags_sex(1,i)*log(pred_tags(1,i)));
-    fcomp(1)     += pred_tags(2,i)-(obs_tags_sex(2,i)*log(pred_tags(2,i)));
+    fcomp(1)     += pred_tags_sex(1,i)-(obs_tags_sex(1,i)*log(pred_tags_sex(1,i)));
+    fcomp(1)     += pred_tags_sex(2,i)-(obs_tags_sex(2,i)*log(pred_tags_sex(2,i)));
     fcomp(2)     -= (rep_obs(i,1)*log(repr(i))) +
                     (rep_obs(i,2)*(log(1.-repr(i))));
   }
@@ -209,10 +212,13 @@ FUNCTION void get_likelihoods()
   */
 // Jim's addition to objective function that penalizes movements being different into and out of the area
 // option to change penalty in different phases... this can be useful to detect local minima
-  fcomp(3)  = lambda_M*square(lnM);
-  fcomp(4)  = norm2(RF(1));
-  fcomp(4) += norm2(RF(2));
-
+  if (active(lnM))
+    fcomp(3)  = lambda_M*square(lnM);
+  if (active(RF))
+  {
+    fcomp(4)  = lambda_RF*norm2(RF(1));
+    fcomp(4) += lambda_RF*norm2(RF(2));
+  }
   f=sum(fcomp);
 
 FUNCTION void get_Peterson()
@@ -242,11 +248,10 @@ FUNCTION void get_Peterson()
     }
     */ 
 
-
 REPORT_SECTION
-// report section should be cleaned up!
+  Biomass = sum(Ninit)*MeanWt;
   int i,ii;
-  report<<"F "<<endl<<f<<" "<<fcomp<<endl;
+  report<<"NLL "<<endl<<fcomp<<" "<<f<<endl;
   report<< "Ninit"<<endl;
   report<< Ninit  <<endl;
   report<< "Biomass"<<endl;
@@ -254,21 +259,29 @@ REPORT_SECTION
   report<< "Obs_Tags"<<endl;
   report <<obs_tags<<endl;
   report<< "Pred_Tags "<<endl;
-  report <<pred_tags<<endl;
-   // for (ii=1; ii<=n_events; ii++)  report<<obs_tags(ii,1)<<" "<<obs_tags(ii,2)<<endl;
+  report <<pred_tags_sex<<endl;
   report<< "ploss"<<endl;
   report<<ploss<<endl;
-  // report<< "ER"<<endl;
-  // report<<sum(C)/sum(N(0))<<endl;
   report<< "N"<<endl;
   report<<N<<endl;
   report<<"prob_no_tag "<<prob_no_tag<<endl;
   report<<"surv "<<surv<<endl;
   report<<" rep_rate "<<repr<<endl;
-  report<<"DaysElapsed"<<endl;
+  report<<"DaysElapsed pred_tags_male obs_tags_male pred_tags_fem obs_tags_fem RF_male RF_fem "<<endl;
   double dcnt=0.;
   for (int i=1;i<=n_events;i++)
   {
     dcnt+=ndays(i);
-    report<<dcnt<<endl;
+    report<<dcnt<<" "
+          << pred_tags_sex(1,i) <<" "
+          << obs_tags_sex(1,i)  <<" "
+          << pred_tags_sex(2,i) <<" "
+          << obs_tags_sex(2,i)  <<" "
+          << mfexp(RF(1,i))     <<" "
+          << mfexp(RF(2,i))     <<" "
+          // << N(1,i)<<" "
+          // << N(2,i)<<" "
+          // << (N(1,0)+N(2,0)) - (N(1,i)+N(2,i))<<" "
+          // << MeanWt*(N(1,i)+N(2,i))<<" "
+          << endl;
   }
