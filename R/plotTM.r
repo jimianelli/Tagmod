@@ -7,15 +7,48 @@ mc=read.table("../src/arc/pet_all_s2_mcout.rep",skip=1,header=F)
 mc=read.table("../src/arc/pet_all_mcout.rep",skip=1,header=F)
 colnames(mc)=c("B","N","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
 plot(density(mc$B),xlim=c(0,800),xlab="Biomass")
-mc=read.table("../src/arc/seg_all_mcout.rep",skip=1,header=F)
-mc=read.table("../src/arc/tan_all_mcout.rep",skip=1,header=F)
-mc=read.table("../src/arc/pet_011_mcout.rep",skip=1,header=F)
-mc=read.table("../src/arc/seg_011_mcout.rep",skip=1,header=F)
-mc=read.table("../src/arc/tan_011_mcout.rep",skip=1,header=F)
-.MyPlot("../src/arc/pet_all_mcout.rep")
-.MyLines("../src/arc/pet_011_mcout.rep",col="green")
-.MyLines("../src/arc/pet_all_s3_mcout.rep",col="red")
-b
+mcnames=1:10
+mcnames
+mcnames[1]="../src/arc/pet_all_mcout.rep"
+mcnames[2]="../src/arc/pet_all_s1_mcout.rep"
+mcnames[3]="../src/arc/pet_all_s2_mcout.rep"
+mcnames[4]="../src/arc/pet_all_s3_mcout.rep"
+mcnames[5]="../src/arc/pet_all_s4_mcout.rep"
+mcnames[6]="../src/arc/pet_all_s5_mcout.rep"
+mcnames[7]="../src/arc/pet_011_mcout.rep"
+mcnames[8]="../src/arc/tan_all_mcout.rep"
+mcnames[9]="../src/arc/tan_011_mcout.rep"
+mcnames[10]="../src/arc/seg_all_mcout.rep"
+mcnames[11]="../src/arc/seg_011_mcout.rep"
+mcnames[12]="../src/arc/seg_all_s1_mcout.rep"
+mcnames[13]="../src/arc/seg_all_s2_mcout.rep"
+mcnames[14]="../src/arc/seg_all_s3_mcout.rep"
+mcnames[15]="../src/arc/seg_all_s4_mcout.rep"
+mcnames[16]="../src/arc/seg_all_s5_mcout.rep"
+
+.MyPlot(mcnames[1],xlim=c(0,550))
+.MyLines(mcnames[2] ,col="green")
+.MyLines(mcnames[3] ,col="red")
+.MyLines(mcnames[4] ,col="green")
+.MyLines(mcnames[5] ,col="red")
+.MyLines(mcnames[6] ,col="red",lty=2,lwd=3)
+.MyLines(mcnames[7] ,col="red",lty=2,lwd=1)
+
+.MyLines(mcnames[8] ,col="red",lty=2,lwd=3)
+.MyLines(mcnames[9] ,col="red",lty=2,lwd=1)
+
+.MyPlot(mcnames[10])
+.MyLines(mcnames[11])
+.MyLines(mcnames[12] ,col="green")
+.MyLines(mcnames[13] ,col="red")
+.MyLines(mcnames[14] ,col="green")
+.MyLines(mcnames[15] ,col="red")
+.MyLines(mcnames[16] ,col="red",lty=2,lwd=3)
+
+
+
+
+
 .MyPlot <- function( repObj = "../src/arc/tan_011_mcout.rep",xlim=c(0,700),main="Biomass"){
   mc=read.table(repObj,skip=1,header=F)
   colnames(mc)=c("B","N","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
@@ -26,6 +59,10 @@ b
   mc=read.table(repObj,skip=1,header=F)
   colnames(mc)=c("B","N","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
   lines(density(mc$B),lty=lty,lwd=lwd,col=col)
+  print(density(mc$B))
+  print(density(mc$B)$x)
+  print(density(mc$B)$y)
+  names(density(mc$B))
 }
 
 quantile(mc$B,.8)
