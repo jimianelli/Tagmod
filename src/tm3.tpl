@@ -49,6 +49,7 @@
   !! obs_tags_sex(1) = elem_prod(p_male_rec , obs_tags); obs_tags_sex(2) = obs_tags - obs_tags_sex(1);
   // !! cout <<obs_tags_sex<<endl;exit(1);
 
+  init_int ph_RF;
   init_int icheck;
 
  LOC_CALCS
@@ -56,9 +57,7 @@
  END_CALCS 
   number surv_init;
   number initpenal;
-  int ph_RF;
  LOC_CALCS
-   ph_RF = 3;
 // command line arguments for controlling code (override data file inputs)
    adstring infile;
    int on;
@@ -103,7 +102,7 @@ PARAMETER_SECTION
   init_bounded_number ploss(0,1);
   init_bounded_number surv(0,1,2);
   init_bounded_vector repr(1,n_events,0.05,1,1);
-  init_matrix RF(1,2,1,n_events)
+  init_matrix RF(1,2,1,n_events,ph_RF)
   number prob_no_tag;
   matrix N(1,2,0,n_events);
   matrix Tags(1,2,0,n_events);
