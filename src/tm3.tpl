@@ -13,6 +13,21 @@
  //=====================================================================================
  //
  DATA_SECTION
+  // |---------------------|
+  // | SIMULATION CONTROLS |
+  // |---------------------|
+  int simflag;
+  int rseed
+ LOC_CALCS
+    simflag = 0;
+    rseed   = 0;
+    int opt,on;
+    if((on=option_match(ad_comm::argc,ad_comm::argv,"-sim",opt))>-1)
+    {
+      simflag = 1;
+      rseed   = atoi(ad_comm::argv[on+1]);
+    }
+ END_CALCS  
   // |------------------------|
   // | DATA AND CONTROL FILES |
   // |------------------------|
@@ -42,66 +57,37 @@
   // init_int nrep_obs;
   init_matrix rep_obs(1,n_events,1,2);
   init_number p_male_rel
+  init_number sample_rel
   vector tag_rel(1,2)
   !! tag_rel(1) = p_male_rel * T; tag_rel(2) = T - tag_rel(1);
   init_vector p_male_catch(1,n_events);
+  init_vector sample_catch(1,n_events);
   matrix Catch_sex(1,2,1,n_events);
   !! Catch_sex(1) = elem_prod(p_male_catch , C); Catch_sex(2) = C - Catch_sex(1);
- //  Tag recovery male, female, unsexed per event
+  //  Tag recovery male, female, unsexed per event
   init_vector p_male_rec(1,n_events);
+  init_vector sample_rec(1,n_events);
   matrix obs_tags_sex(1,2,1,n_events);
   !! obs_tags_sex(1) = elem_prod(p_male_rec , obs_tags); obs_tags_sex(2) = obs_tags - obs_tags_sex(1);
   // !! cout <<obs_tags_sex<<endl;exit(1);
 
   init_int icheck;
-
- LOC_CALCS
-  // count number of recruitment factors needed (one each fishing event)
- END_CALCS 
   number surv_init;
-  number initpenal;
- LOC_CALCS
-// command line arguments for controlling code (override data file inputs)
-   adstring infile;
-   int on;
-   int nopt=0;
-   char * end;
-   initpenal=0;
-   if( (on=option_match(ad_comm::argc,ad_comm::argv,"-initPen",nopt)) >-1)
-   {
-     initpenal=strtod(ad_comm::argv[on+1], &end);
-   }
-
-   cout<<initpenal<<endl;
-
-   if(icheck!=12345)cout <<" data file problem "<<endl;
-   if(icheck!=12345)exit(1);
-   if( (on=option_match(ad_comm::argc,ad_comm::argv,"-ind",nopt)) >-1)
-   {
-     infile=(ad_comm::argv[on+1]);
-   }
-   surv_init=surv_data(1)/sum(surv_data);
-
- END_CALCS
- !!CLASS ofstream mout("mcout.rep");
- !!CLASS adstring tmpname(infile);
+  !! if(icheck!=12345) {cout <<" data file problem "<<endl; exit(1);}
+  !! surv_init=surv_data(1)/sum(surv_data);
   int i
-  int tloc
-  int loc
-  int kk
   int iday
   int mcflag
   !! mcflag=0;
 
 INITIALIZATION_SECTION
-  // Ninit 20
-  lnNinit 6
-  // pmove 0.001
+  lnNinit 6.
   surv surv_init
 
 PARAMETER_SECTION
   init_number lnNinit(1);
   init_number lnM(M_phase);
+  init_bounded_number p_male_rel_hat(0,1.,2);
   init_bounded_number ploss(0,1);
   init_bounded_number surv(0,1,2);
   init_bounded_vector repr(1,n_events,0.05,1,1);
@@ -121,53 +107,44 @@ PARAMETER_SECTION
   // Reporting rates for commercial and charter
   sdreport_vector RepRate(1,2);
   objective_function_value f
+PRELIMINARY_CALCS_SECTION
+  if( simflag )
+  {
+    if(!global_parfile)
+    {
+      cerr << "Must have a gsmac.pin file to use the -sim command line option"<<endl;
+      ad_exit(1);
+    }
+    cout<<"|———————————————————————————————————————————|"        <<endl;
+    cout<<"|*** RUNNING SIMULATION WITH RSEED = "<<rseed<<" ***|"<<endl;
+    cout<<"|———————————————————————————————————————————|"        <<endl;
+    
+    simulation_model();
+    //exit(1);
+  }
 
 PROCEDURE_SECTION
+  initialize_params();
+
+  do_dynamics();
+  get_likelihoods();
+
+  if(mceval_phase()|sd_phase())
+    set_output();
+
+
+FUNCTION initialize_params
   N.initialize();
   Tags.initialize();
-  fcomp.initialize();
   prob_no_tag = (1.-prop_double_tagged) * ploss + prop_double_tagged * ploss*ploss;
-  Ninit(1)    = p_male_rel      * mfexp(lnNinit);
-  Ninit(2)    = (1.-p_male_rel) * mfexp(lnNinit);
+  Ninit(1)    = p_male_rel_hat      * mfexp(lnNinit);
+  Ninit(2)    = (1.-p_male_rel_hat) * mfexp(lnNinit);
   N(1,0)      = 1.e6*Ninit(1);
   N(2,0)      = 1.e6*Ninit(2);
   M           = M_in * mfexp(lnM);
   Tags(1,0)   = tag_rel(1)*(1-prob_no_tag)*surv;
   Tags(2,0)   = tag_rel(2)*(1-prob_no_tag)*surv;
-  
-  do_dynamics();
-  get_likelihoods();
-
-  if(mceval_phase()|sd_phase())
-  {
-    dvector nRepRate(1,2);
-    dvariable MeanN=0;
-    nRepRate.initialize();
-    for (int i=1;i<=n_events;i++)
-    {
-      RepRate(repindex(i)) += repr(i);
-      nRepRate(repindex(i))++;
-      MeanN += N(1,i);
-      MeanN += N(2,i);
-    }
-    MeanN /= double(n_events);
-    RepRate = elem_div(RepRate,nRepRate);
-    Biomass = sum(Ninit)*MeanWt;
-    ER      = sum(C)/MeanN;
-  }
-  if(mceval_phase())
-  {
-    if (mcflag)
-    {
-      mout<<Biomass<<" "<< Ninit<<" "<<ploss<<" "<<RepRate<<" "<<M<<" "<<ER<<" "<<surv<<" "<<f<<" "<<fcomp<<endl;
-    }
-    else
-    {
-      mout<<"N  p_loss  Rep_Rate_F  Ref_Rate_SF M ER  Survival  ObjFun  ObjF_Tags ObjF_Repr ObjF_M x x x"<<endl;
-      mcflag=1;
-    }
-  }
-
+ 
 FUNCTION do_dynamics
 // do_sims equals one for estimation, zero for catch simulations
   for (i=1; i<=n_events; i++)
@@ -177,39 +154,45 @@ FUNCTION do_dynamics
     dvariable ERtmp;      
     ERtmp                = C(i)/(N(1,i)+N(2,i));
     dvariable sr         = 1.-ERtmp;
-    if(sr< 0.01) { ffpen = 0.; dvariable  kludge; kludge   = posfun(sr,0.01,ffpen); ERtmp    = 1.-kludge; cout <<" Exceeded population with the catch... "<< kludge<<" "<<C(i)<<" "<<N(i)<<endl; fcomp(6)+= 1e6*ffpen; }
-    N(1,i)               -= Catch_sex(1,i);                                     // subtract off catch from remaining stock
-    N(2,i)               -= Catch_sex(2,i);                                     // subtract off catch from remaining stock
-    pred_tags_sex(1,i)   = Tags(1,i-1)*ERtmp*mfexp(-ndays(i)*M/365.);   // predicted tags a function of ER and previous tag numbers
-    Tags(1,i)            = Tags(1,i-1) - pred_tags_sex(1,i);               // subtract off catch from remaining stock
-    pred_tags_sex(2,i)   = Tags(2,i-1)*ERtmp*mfexp(-ndays(i)*M/365.);   // predicted tags a function of ER and previous tag numbers
-    Tags(2,i)            = Tags(2,i-1) - pred_tags_sex(2,i);               // subtract off catch from remaining stock
+    if(sr< 0.01) { ffpen = 0.; dvariable  kludge; kludge   = posfun(sr,0.01,ffpen); ERtmp    = 1.-kludge; cout <<" Exceeded population with the catch... "<< kludge<<" "<<C(i)<<" "<<N(1,i)<<endl; fcomp(6)+= 1e6*ffpen; }
+    N(1,i)               -= Catch_sex(1,i);                            // subtract off catch from remaining stock
+    N(2,i)               -= Catch_sex(2,i);                            // subtract off catch from remaining stock
+    pred_tags_sex(1,i)   = Tags(1,i-1)*ERtmp*mfexp(-ndays(i)*M/365.);  // predicted tags a function of ER and previous tag numbers
+    Tags(1,i)            = Tags(1,i-1) - pred_tags_sex(1,i);           // subtract off catch from remaining stock
+    pred_tags_sex(2,i)   = Tags(2,i-1)*ERtmp*mfexp(-ndays(i)*M/365.);  // predicted tags a function of ER and previous tag numbers
+    Tags(2,i)            = Tags(2,i-1) - pred_tags_sex(2,i);           // subtract off catch from remaining stock
+    pred_tags_sex(1,i) *= repr(i);
+    pred_tags_sex(2,i) *= repr(i);
   }
 
 FUNCTION void get_likelihoods()
-  int i,tloc,kk,irf;
+  fcomp.initialize();
+  dvariable ptmp;
+  if (active(RF))
+  {
+    ptmp            = N(1,0)/(N(1,0)+N(2,0));
+    fcomp(3)     -= sample_rel * (p_male_rel+1e-3) * log(ptmp+1e-3);
+    fcomp(3)     -= sample_rel * (1-p_male_rel+1e-3) * log(1-ptmp+1e-3);
+  }
   for (i=1; i<=n_events; i++)
   {
-    pred_tags_sex(1,i) *= repr(i);
-    pred_tags_sex(2,i) *= repr(i);
     // cout<< pred_tags(i,tloc,loc)<<" "<<obs_tags(i,tloc,loc)<<" "<<log(pred_tags(i,tloc,loc));
     fcomp(1)     += pred_tags_sex(1,i)-(obs_tags_sex(1,i)*log(pred_tags_sex(1,i)));
     fcomp(1)     += pred_tags_sex(2,i)-(obs_tags_sex(2,i)*log(pred_tags_sex(2,i)));
     fcomp(2)     -= (rep_obs(i,1)*log(repr(i))) +
                     (rep_obs(i,2)*(log(1.-repr(i))));
+    if (active(RF))                
+    {
+      ptmp          = pred_tags_sex(1,i)/(pred_tags_sex(1,i)+pred_tags_sex(2,i));
+      fcomp(3)     -= sample_rec(i) * (p_male_rec(i)+1e-3) * log(ptmp+1e-3);
+      fcomp(3)     -= sample_rec(i) * (1-p_male_rec(i)+1e-3) * log(1-ptmp+1e-3);
+      ptmp          = N(1,i)/(N(1,i)+N(2,i));
+      fcomp(3)     -= sample_catch(i) * (p_male_catch(i)+1e-3) * log(ptmp+1e-3);
+      fcomp(3)     -= sample_catch(i) * (1-p_male_catch(i)+1e-3) * log(1-ptmp+1e-3);
+    }
   }
   fcomp(2) -= (one*log(2.*ploss*(1.-ploss)) + two*(log((1.-ploss)*(1.-ploss))));
   fcomp(2) -= (surv_data(1)*log(surv))+ (surv_data(2)*log(1.-surv));
-  /*
-  for (kk=1; kk<=2; kk++)
-  {
-    for (int j=1; j<=nrep_obs(kk); j++)
-    {
-      fcomp(2) -= (rep_obs(kk,j,1)*log(repr(kk))) +
-                  (rep_obs(kk,j,2)*(log(1.-repr(kk))));
-    }
-  }
-  */
 // Jim's addition to objective function that penalizes movements being different into and out of the area
 // option to change penalty in different phases... this can be useful to detect local minima
   if (active(lnM))
@@ -220,33 +203,6 @@ FUNCTION void get_likelihoods()
     fcomp(4) += lambda_RF*norm2(RF(2));
   }
   f=sum(fcomp);
-
-FUNCTION void get_Peterson()
-// Peterson estimates by fishing event
-  for (i=1; i<=n_events; i++)
-  {
-    int itmp=repindex(i);
-    if(repindex(i)>itmp)
-      itmp=repindex(i);
-    dvariable rep=repr(itmp);
-    if((obs_tags(i))>0)  
-      Ntot_Peterson(i) = (T * (1.-prob_no_tag) *surv * C(i) * rep + 1) / (1+obs_tags(i)) -1 ;
-    // T*(1-surv)*C*RepRate/(sumObs)
-      // Ntot_Peterson(i)= sum(T*1-prob_no_tag*surv)*sum(elem_div(C(i),RF(i)))*rep/sum(obs_tags(i));
-      // Ntot_Peterson(i) = (T * (1.-prob_no_tag) *surv * C(i) * rep ) / (obs_tags(i))  ;
-    else  
-      Ntot_Peterson(i)=0;
-  }
-
- /* FUNCTION sim_catches
-    Nsims.initialize();
-    get_Peterson();
-    if( num_events >0)
-    {
-         Nsims(0)=1e6*Ninit;
-         do_dynamics(0,nsim_days,sim_days,Csims,Nsims);  // to do the catch simulations
-    }
-    */ 
 
 REPORT_SECTION
   Biomass = sum(Ninit)*MeanWt;
@@ -285,3 +241,70 @@ REPORT_SECTION
           // << MeanWt*(N(1,i)+N(2,i))<<" "
           << endl;
   }
+  
+FUNCTION set_output
+  {
+    dvector nRepRate(1,2);
+    dvariable MeanN=0;
+    nRepRate.initialize();
+    for (int i=1;i<=n_events;i++)
+    {
+      RepRate(repindex(i)) += repr(i);
+      nRepRate(repindex(i))++;
+      MeanN += N(1,i);
+      MeanN += N(2,i);
+    }
+    MeanN /= double(n_events);
+    RepRate = elem_div(RepRate,nRepRate);
+    Biomass = sum(Ninit)*MeanWt;
+    ER      = sum(C)/MeanN;
+  }
+  if(mceval_phase())
+  {
+    if (mcflag)
+    {
+      mcout<<Biomass<<" "<< Ninit<<" "<<ploss<<" "<<RepRate<<" "<<M<<" "<<ER<<" "<<surv<<" "<<f<<" "<<fcomp<<endl;
+    }
+    else
+    {
+      mcout<<"N  p_loss  Rep_Rate_F  Ref_Rate_SF M ER  Survival  ObjFun  ObjF_Tags ObjF_Repr ObjF_M x x x"<<endl;
+      mcflag=1;
+    }
+  }
+
+  /**
+
+   * @brief Simulation model
+   * @details Uses many of the same routines as the assessment
+   * model, over-writes the observed data in memory with simulated 
+   * data.
+   * 
+   */
+FUNCTION simulation_model
+  // random number generator
+  random_number_generator rng(rseed);
+  do_dynamics();
+  obs_tags_sex = value(pred_tags_sex);
+  /* dvector drec_dev(syr+1,nyr);
+  drec_dev.fill_randn(rng);
+  rec_dev = exp(logSigmaR) * drec_dev;
+  */
+GLOBALS_SECTION
+  #include <admodel.h>
+  /**
+  \def ECHO(object)
+  Prints name and value of \a object on echoinput %ofstream file.
+  */
+   #undef ECHO
+   #define ECHO(object) echoinput << #object << "\n" << object << endl;
+   // #define ECHO(object,text) echoinput << object << "\t" << text << endl;
+ 
+   /**
+   \def check(object)
+   Prints name and value of \a object on checkfile %ofstream output file.
+   */
+   #define check(object) checkfile << #object << "\n" << object << endl;
+   // Open output files using ofstream
+   ofstream echoinput("echoinput.rep");
+   ofstream checkfile("checkfile.rep");
+   ofstream mcout("mcout.rep");

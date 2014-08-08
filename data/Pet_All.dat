@@ -2,6 +2,9 @@
 # Natural mortality
 # Mean   CV  Phase(neg turns off)
   0.3   0.2    3
+# Recruitment factor
+# CV  Phase(neg turns off)
+  0.2    3
 # Average weight of released Atkas
 0.366
 #recovery events
@@ -67,5 +70,27 @@
 510 11 # the 2nd charter recover experiments
 219 49 # commercial
 359 100 # commercial
+# proportion male in releases
+0.576868829
+# By recovery proportion male
+0.464285714
+0.555555556
+1
+0.371681416
+0.185185185
+0.428571429
+0.2
+0.230769231
+0.278688525
+# proportion male tags recovered  by event
+0.725
+0.606060606
+0.842105263
+0.706666667
+0.794117647
+0.777777778
+0.4
+0.569444444
+0.666666667
 # Check
 12345
