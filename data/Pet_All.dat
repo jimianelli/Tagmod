@@ -1,10 +1,10 @@
 # Petrel 2011-2012, no defined area, all stratum 1
 # Natural mortality
 # Mean   CV  Phase(neg turns off)
-  0.3   0.2    3
+  0.3   0.2   -3
 # Recruitment factor
 # CV  Phase(neg turns off)
-  0.2    3
+  .3    4
 # Average weight of released Atkas
 0.366
 #recovery events
@@ -23,15 +23,15 @@
 16263525
 1888220
 #tag recoveries; rows = recovery events; columns = no inside/outside; tag recoveries include double tagged fish
-81
+82
 35
 20
-72
-95
+76
+115
 28
-5
-46
-6
+10
+78
+8
 #report rate codes; rows - recovery events; columns = no inside/outside
 1
 1
@@ -70,27 +70,18 @@
 510 11 # the 2nd charter recover experiments
 219 49 # commercial
 359 100 # commercial
-# proportion male in releases
+# proportion maile in releases
 0.576868829
+# Release sample size
+70.9
 # By recovery proportion male
-0.464285714
-0.555555556
-1
-0.371681416
-0.185185185
-0.428571429
-0.2
-0.230769231
-0.278688525
+0.552009456 0.541455161 0.606958763 0.532494759 0.492290749 0.458715596 0.502290076 0.533462658 0.580291971
+# By recovery sample size 
+#846 591 1552 954 908 109 1310 4124 274
+84.6 59.1 155.2 95.4 90.8 10.9 131.0 412.4 27.4
 # proportion male tags recovered  by event
-0.725
-0.606060606
-0.842105263
-0.706666667
-0.794117647
-0.777777778
-0.4
-0.569444444
-0.666666667
+0.725 0.606060606 0.842105263 0.706666667 0.794117647 0.777777778 0.4 0.569444444 0.666666667
+# number of tags recovered  by event
+82 35 20 76 115 28 10 78 8
 # Check
 12345

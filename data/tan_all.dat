@@ -1,11 +1,14 @@
 # Seguam 2011-2012, no defined area, all stratum 1
 # Natural mortality
 # Mean   CV  Phase(neg turns off)
-  0.3   0.2    3
+  0.3   0.2    -3
+# Recruitment factor
+# CV  Phase(neg turns off)
+  .30     4
 # Average weight of released Atkas
 0.694
 #recovery events
-6
+4
 # tagged; column = both sexes
 9123
 #fish examined for tags; rows = recovery events; column = no inside/outside
@@ -14,29 +17,21 @@
 557681
 26040
 650261
-120692
-79936
 #tag recoveries; rows = recovery events; columns = no inside/outside; tag recoveries include double tagged fish
 20
 83
 3
 25
-0
-0
 #report rate codes; rows - recovery events; columns = no inside/outside
 1
 2
 1
 2
-1
-1
 #days between events; rows=recovery events, first row is tagging to first recovery event
 46
-44
-39
-187
-78
-130
+45
+0
+226
 # tag retention; columns = # dbl-tag rec w/both tags, # w/one tag
 28  1
 #proportion double-tagged; columns = no inside/outside
@@ -50,8 +45,17 @@
 710 23 # the 1st charter recover experiments
 660 97 # commercial
 510 11 # the 2nd charter recover experiments
-# 219 49 # commercial
-119 44  # Rate w/o Seafisher doing commercial
-359 100 # commercial
+# proportion maile in releases
+0.531295488
+# Release sample size
+68.7
+# By recovery proportion male
+0.45 0.719242902 0.761904762 0.516192345
+# By recovery sample size 
+4.0 158.5 6.2 101.9
+# proportion male tags recovered  by event
+0.588235294 0.923076923 1. 0.791666667
+# number of tags recovered  by event
+20 83 3 25
 # Check
 12345

@@ -49,7 +49,13 @@
   init_vector C(1,n_events);
   init_vector obs_tags(1,n_events);
   init_ivector repindex(1,n_events);
-  init_vector ndays(1,n_events);
+  init_vector ndays(1,n_events);  // Days elapsed since tagging
+  ivector RF_idx(1,n_events);
+  !! RF_idx.initialize(); RF_idx(1)=1;
+  !! for (int i=2;i<=n_events;i++) if (ndays(i)!=0) RF_idx(i) = RF_idx(i-1)+1; else RF_idx(i) = RF_idx(i-1) ;
+  int n_RF        // number of rec factors
+  !! n_RF = RF_idx(n_events);
+  !! cout <<RF_idx<<endl;
   init_number two // # double tag recovered with two tags
   init_number one // # double tag recovered with only one tag
   init_number prop_double_tagged;
@@ -62,13 +68,14 @@
   !! tag_rel(1) = p_male_rel * T; tag_rel(2) = T - tag_rel(1);
   init_vector p_male_catch(1,n_events);
   init_vector sample_catch(1,n_events);
-  matrix Catch_sex(1,2,1,n_events);
-  !! Catch_sex(1) = elem_prod(p_male_catch , C); Catch_sex(2) = C - Catch_sex(1);
+  matrix obs_catch_sex(1,2,1,n_events);
+  !! obs_catch_sex(1) = elem_prod(p_male_catch , C); obs_catch_sex(2) = C - obs_catch_sex(1);
   //  Tag recovery male, female, unsexed per event
   init_vector p_male_rec(1,n_events);
   init_vector sample_rec(1,n_events);
   matrix obs_tags_sex(1,2,1,n_events);
-  !! obs_tags_sex(1) = elem_prod(p_male_rec , obs_tags); obs_tags_sex(2) = obs_tags - obs_tags_sex(1);
+  !! obs_tags_sex(1) = elem_prod(p_male_rec , obs_tags); 
+  !! obs_tags_sex(2) = obs_tags - obs_tags_sex(1);
   // !! cout <<obs_tags_sex<<endl;exit(1);
 
   init_int icheck;
@@ -91,7 +98,7 @@ PARAMETER_SECTION
   init_bounded_number ploss(0,1);
   init_bounded_number surv(0,1,2);
   init_bounded_vector repr(1,n_events,0.05,1,1);
-  init_matrix RF(1,2,1,n_events,ph_RF)
+  init_matrix RF(1,2,1,n_RF,ph_RF)
   number prob_no_tag;
   matrix N(1,2,0,n_events);
   matrix Tags(1,2,0,n_events);
@@ -115,9 +122,9 @@ PRELIMINARY_CALCS_SECTION
       cerr << "Must have a gsmac.pin file to use the -sim command line option"<<endl;
       ad_exit(1);
     }
-    cout<<"|———————————————————————————————————————————|"        <<endl;
+    cout<<"|--------------------------------------------|"        <<endl;
     cout<<"|*** RUNNING SIMULATION WITH RSEED = "<<rseed<<" ***|"<<endl;
-    cout<<"|———————————————————————————————————————————|"        <<endl;
+    cout<<"|--------------------------------------------|"        <<endl;
     
     simulation_model();
     //exit(1);
@@ -147,19 +154,20 @@ FUNCTION initialize_params
  
 FUNCTION do_dynamics
 // do_sims equals one for estimation, zero for catch simulations
+  dvar_vector ERtmp(1,2);      
   for (i=1; i<=n_events; i++)
   {
-    N(1,i)               = N(1,i-1)*mfexp(-ndays(i)*M/365.)*mfexp(RF(1,i));
-    N(2,i)               = N(2,i-1)*mfexp(-ndays(i)*M/365.)*mfexp(RF(2,i));
-    dvariable ERtmp;      
-    ERtmp                = C(i)/(N(1,i)+N(2,i));
-    dvariable sr         = 1.-ERtmp;
+    N(1,i)               = N(1,i-1)*mfexp(-ndays(i)*M/365.)*mfexp(RF(1,RF_idx(i)));
+    N(2,i)               = N(2,i-1)*mfexp(-ndays(i)*M/365.)*mfexp(RF(2,RF_idx(i)));
+    ERtmp(1)             = obs_catch_sex(1,i)/N(1,i);
+    ERtmp(2)             = obs_catch_sex(2,i)/N(2,i);
+    dvariable sr         = 1.-ERtmp(1);
     if(sr< 0.01) { ffpen = 0.; dvariable  kludge; kludge   = posfun(sr,0.01,ffpen); ERtmp    = 1.-kludge; cout <<" Exceeded population with the catch... "<< kludge<<" "<<C(i)<<" "<<N(1,i)<<endl; fcomp(6)+= 1e6*ffpen; }
-    N(1,i)               -= Catch_sex(1,i);                            // subtract off catch from remaining stock
-    N(2,i)               -= Catch_sex(2,i);                            // subtract off catch from remaining stock
-    pred_tags_sex(1,i)   = Tags(1,i-1)*ERtmp*mfexp(-ndays(i)*M/365.);  // predicted tags a function of ER and previous tag numbers
+    N(1,i)               -= obs_catch_sex(1,i);                            // subtract off catch from remaining stock
+    N(2,i)               -= obs_catch_sex(2,i);                            // subtract off catch from remaining stock
+    pred_tags_sex(1,i)   = Tags(1,i-1)*ERtmp(1)*mfexp(-ndays(i)*M/365.);  // predicted tags a function of ER and previous tag numbers
     Tags(1,i)            = Tags(1,i-1) - pred_tags_sex(1,i);           // subtract off catch from remaining stock
-    pred_tags_sex(2,i)   = Tags(2,i-1)*ERtmp*mfexp(-ndays(i)*M/365.);  // predicted tags a function of ER and previous tag numbers
+    pred_tags_sex(2,i)   = Tags(2,i-1)*ERtmp(2)*mfexp(-ndays(i)*M/365.);  // predicted tags a function of ER and previous tag numbers
     Tags(2,i)            = Tags(2,i-1) - pred_tags_sex(2,i);           // subtract off catch from remaining stock
     pred_tags_sex(1,i) *= repr(i);
     pred_tags_sex(2,i) *= repr(i);
@@ -168,9 +176,9 @@ FUNCTION do_dynamics
 FUNCTION void get_likelihoods()
   fcomp.initialize();
   dvariable ptmp;
-  if (active(RF))
+  // if (active(RF))
   {
-    ptmp            = N(1,0)/(N(1,0)+N(2,0));
+    ptmp          = N(1,0)/(N(1,0)+N(2,0));
     fcomp(3)     -= sample_rel * (p_male_rel+1e-3) * log(ptmp+1e-3);
     fcomp(3)     -= sample_rel * (1-p_male_rel+1e-3) * log(1-ptmp+1e-3);
   }
@@ -181,11 +189,12 @@ FUNCTION void get_likelihoods()
     fcomp(1)     += pred_tags_sex(2,i)-(obs_tags_sex(2,i)*log(pred_tags_sex(2,i)));
     fcomp(2)     -= (rep_obs(i,1)*log(repr(i))) +
                     (rep_obs(i,2)*(log(1.-repr(i))));
-    if (active(RF))                
+    // if (active(RF))                
     {
       ptmp          = pred_tags_sex(1,i)/(pred_tags_sex(1,i)+pred_tags_sex(2,i));
       fcomp(3)     -= sample_rec(i) * (p_male_rec(i)+1e-3) * log(ptmp+1e-3);
       fcomp(3)     -= sample_rec(i) * (1-p_male_rec(i)+1e-3) * log(1-ptmp+1e-3);
+
       ptmp          = N(1,i)/(N(1,i)+N(2,i));
       fcomp(3)     -= sample_catch(i) * (p_male_catch(i)+1e-3) * log(ptmp+1e-3);
       fcomp(3)     -= sample_catch(i) * (1-p_male_catch(i)+1e-3) * log(1-ptmp+1e-3);
@@ -203,6 +212,7 @@ FUNCTION void get_likelihoods()
     fcomp(4) += lambda_RF*norm2(RF(2));
   }
   f=sum(fcomp);
+  // cout <<fcomp<<endl;
 
 REPORT_SECTION
   Biomass = sum(Ninit)*MeanWt;
@@ -223,7 +233,7 @@ REPORT_SECTION
   report<<"prob_no_tag "<<prob_no_tag<<endl;
   report<<"surv "<<surv<<endl;
   report<<" rep_rate "<<repr<<endl;
-  report<<"DaysElapsed pred_tags_male obs_tags_male pred_tags_fem obs_tags_fem RF_male RF_fem "<<endl;
+  report<<"DaysElapsed pred_tags_male obs_tags_male pred_tags_fem obs_tags_fem RF_male RF_fem SexRatio"<<endl;
   double dcnt=0.;
   for (int i=1;i<=n_events;i++)
   {
@@ -233,8 +243,9 @@ REPORT_SECTION
           << obs_tags_sex(1,i)  <<" "
           << pred_tags_sex(2,i) <<" "
           << obs_tags_sex(2,i)  <<" "
-          << mfexp(RF(1,i))     <<" "
-          << mfexp(RF(2,i))     <<" "
+          << mfexp(RF(1,RF_idx(i)))     <<" "
+          << mfexp(RF(2,RF_idx(i)))     <<" "
+          << N(1,i)/(N(1,i)+N(2,i)) <<" "
           // << N(1,i)<<" "
           // << N(2,i)<<" "
           // << (N(1,0)+N(2,0)) - (N(1,i)+N(2,i))<<" "
@@ -284,6 +295,17 @@ FUNCTION simulation_model
   // random number generator
   random_number_generator rng(rseed);
   do_dynamics();
+
+  for (i=1; i<=n_events; i++)
+  {
+    N(1,i)               = N(1,i-1)*mfexp(-ndays(i)*M/365.)*mfexp(RF(1,RF_idx(i)));
+    N(2,i)               = N(2,i-1)*mfexp(-ndays(i)*M/365.)*mfexp(RF(2,RF_idx(i)));
+    dvariable ERtmp;      
+    ERtmp                = C(i)/(N(1,i)+N(2,i));
+    obs_catch_sex(1,i)   = value(ERtmp*N(1,i)) ;                            // subtract off catch from remaining stock
+    obs_catch_sex(2,i)   = value(ERtmp*N(2,i)) ;                            // subtract off catch from remaining stock
+  }
+
   obs_tags_sex = value(pred_tags_sex);
   /* dvector drec_dev(syr+1,nyr);
   drec_dev.fill_randn(rng);
