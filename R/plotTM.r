@@ -9,7 +9,7 @@ names(mc)
 mc=read.table("../src/arc/seg_all_mcout.rep",skip=1,header=F)
 mc=read.table("../src/arc/pet_all_mcout.rep",skip=1,header=F)
 colnames(mc)=c("Biom","Nmale","NFemale","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x")
-summary(mc$ER)
+plot(density(mc$ER))
 plot(density(mc$B),xlim=c(0,800),xlab="Biomass")
 mcnames=1:10
 mcnames
@@ -43,6 +43,9 @@ mcnames[16]="../src/arc/seg_all_s5_mcout.rep"
 .MyLines(mcnames[8] ,col="red",lty=2,lwd=3)
 .MyLines(mcnames[9] ,col="red",lty=2,lwd=1)
 
+.MyPlot2(mcnames[1])
+.MyPlot2(mcnames[2])
+.MyPlot2(mcnames[3])
 .MyPlot(mcnames[10])
 .MyLines(mcnames[11])
 .MyLines(mcnames[12] ,col="green")
@@ -54,21 +57,23 @@ mcnames[16]="../src/arc/seg_all_s5_mcout.rep"
 
 
 
+.MyPlot2 <- function( repObj = "../src/arc/tan_011_mcout.rep",xlim=c(0,.2),main="Exploitation rate"){
+  mc=read.table(repObj,skip=1,header=F)
+  colnames(mc)=c("B","Nmales","NFemale","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
+  plot(density(mc$ER),xlim=xlim,main=main,xlab="Exploitation rate")
+}
 
 .MyPlot <- function( repObj = "../src/arc/tan_011_mcout.rep",xlim=c(0,700),main="Biomass"){
   mc=read.table(repObj,skip=1,header=F)
-  colnames(mc)=c("B","N","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
+  colnames(mc)=c("B","Nmales","NFemale","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
   plot(density(mc$B),xlim=xlim,main=main,xlab="Biomass")
 }
 
 .MyLines <- function( repObj = "../src/arc/tan_011_mcout.rep",col=1,lty=1,lwd=1 ){
   mc=read.table(repObj,skip=1,header=F)
-  colnames(mc)=c("B","N","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
   lines(density(mc$B),lty=lty,lwd=lwd,col=col)
-  print(density(mc$B))
-  print(density(mc$B)$x)
-  print(density(mc$B)$y)
-  names(density(mc$B))
+  colnames(mc)=c("B","Nmales","NFemale","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
+  # print(density(mc$B)) print(density(mc$B)$x) print(density(mc$B)$y) names(density(mc$B))
 }
 
 quantile(mc$B,.8)

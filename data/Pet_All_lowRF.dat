@@ -1,0 +1,87 @@
+# Petrel 2011-2012, no defined area, all stratum 1
+# Natural mortality
+# Mean   CV  Phase(neg turns off)
+  0.3   0.2   -3
+# Recruitment factor
+# CV  Phase(neg turns off)
+  .03    4
+# Average weight of released Atkas
+0.366
+#recovery events
+9
+# tagged; column = both sexes
+9961
+#fish examined for tags; rows = recovery events; column = no inside/outside
+#recovery evenets: fishery 1, fishery 2, charter 2, fishery 3, fishery 4, fishery 5, charter 5, fishery 6, fishery 7
+4446931
+3688433
+1244519
+7003832
+5963828
+766554
+1252326
+16263525
+1888220
+#tag recoveries; rows = recovery events; columns = no inside/outside; tag recoveries include double tagged fish
+82
+35
+20
+76
+115
+28
+10
+78
+8
+#report rate codes; rows - recovery events; columns = no inside/outside
+1
+1
+2
+1
+1
+1
+2
+1
+1
+#days between events; rows=recovery events, first row is tagging to first recovery event
+46
+49
+0
+36
+149
+8
+0
+108
+130
+# tag retention; columns = # dbl-tag rec w/both tags, # w/one tag
+98 12
+#proportion double-tagged; columns = no inside/outside
+0.24
+#survival experiments, 2011 only; columns=#survived, #died
+265 16 
+#reporting rate data; rows=event 
+# columns=#reported, #not reported; all tags
+# is not area specific, includes seeded tags from any area during the fishery
+660 97 # commercial
+660 97 # commercial
+710 23 # the 1st charter recover experiments
+660 97 # commercial
+247 65 # commercial
+100 40 # commercial
+510 11 # the 2nd charter recover experiments
+219 49 # commercial
+359 100 # commercial
+# proportion maile in releases
+0.576868829
+# Release sample size
+70.9
+# By recovery proportion male
+0.552009456 0.541455161 0.606958763 0.532494759 0.492290749 0.458715596 0.502290076 0.533462658 0.580291971
+# By recovery sample size 
+#846 591 1552 954 908 109 1310 4124 274
+84.6 59.1 155.2 95.4 90.8 10.9 131.0 412.4 27.4
+# proportion male tags recovered  by event
+0.725 0.606060606 0.842105263 0.706666667 0.794117647 0.777777778 0.4 0.569444444 0.666666667
+# number of tags recovered  by event
+82 35 20 76 115 28 10 78 8
+# Check
+12345
