@@ -256,19 +256,28 @@ REPORT_SECTION
 FUNCTION set_output
   {
     dvector nRepRate(1,2);
-    dvariable MeanN=0;
+    dvariable MeanN = 0;
+    double cumdays  = 0;
+    double sumcatch = 0;
+    double ntmp     = 0;
     nRepRate.initialize();
     for (int i=1;i<=n_events;i++)
     {
+      cumdays += ndays(i);
+      if (cumdays < 360)
+      {
+        MeanN += N(1,i);
+        MeanN += N(2,i);
+        ntmp++;
+        sumcatch += C(i);
+      }
       RepRate(repindex(i)) += repr(i);
       nRepRate(repindex(i))++;
-      MeanN += N(1,i);
-      MeanN += N(2,i);
     }
-    MeanN /= double(n_events);
+    MeanN /= ntmp;
     RepRate = elem_div(RepRate,nRepRate);
     Biomass = sum(Ninit)*MeanWt;
-    ER      = sum(C)/MeanN;
+    ER      = sumcatch/MeanN;
   }
   if(mceval_phase())
   {
@@ -278,7 +287,7 @@ FUNCTION set_output
     }
     else
     {
-      mcout<<"N  p_loss  Rep_Rate_F  Ref_Rate_SF M ER  Survival  ObjFun  ObjF_Tags ObjF_Repr ObjF_M x x x"<<endl;
+      mcout<<"Biom N_male N_female  p_loss  Rep_Rate_F  Rep_Rate_SF M ER  Survival  ObjFun  ObjF_Tags ObjF_Repr ObjF_M x x"<<endl;
       mcflag=1;
     }
   }
