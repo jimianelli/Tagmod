@@ -261,6 +261,7 @@ FUNCTION set_output
     double sumcatch = 0;
     double ntmp     = 0;
     nRepRate.initialize();
+    RepRate.initialize();
     for (int i=1;i<=n_events;i++)
     {
       cumdays += ndays(i);
