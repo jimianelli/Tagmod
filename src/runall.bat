@@ -39,3 +39,6 @@ call run%1 tan_011_s3
 call run%1 seg_all
 call run%1 pet_all
 call run%1 tan_all
+call run%1 seg_all_lowRF
+call run%1 pet_all_lowRF
+call run%1 tan_all_lowRF

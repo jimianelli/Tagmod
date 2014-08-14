@@ -155,20 +155,24 @@ FUNCTION initialize_params
 FUNCTION do_dynamics
 // do_sims equals one for estimation, zero for catch simulations
   dvar_vector ERtmp(1,2);      
+  dvariable Stmp;      
+  ERtmp.initialize(); // Exploitation
+  Stmp.initialize();  // Survival
   for (i=1; i<=n_events; i++)
   {
-    N(1,i)               = N(1,i-1)*mfexp(-ndays(i)*M/365.)*mfexp(RF(1,RF_idx(i)));
-    N(2,i)               = N(2,i-1)*mfexp(-ndays(i)*M/365.)*mfexp(RF(2,RF_idx(i)));
+    Stmp                 = mfexp(-ndays(i)*M/365.);
+    N(1,i)               = N(1,i-1)*Stmp * mfexp(RF(1,RF_idx(i)));
+    N(2,i)               = N(2,i-1)*Stmp * mfexp(RF(2,RF_idx(i)));
     ERtmp(1)             = obs_catch_sex(1,i)/N(1,i);
     ERtmp(2)             = obs_catch_sex(2,i)/N(2,i);
     dvariable sr         = 1.-ERtmp(1);
     if(sr< 0.01) { ffpen = 0.; dvariable  kludge; kludge   = posfun(sr,0.01,ffpen); ERtmp    = 1.-kludge; cout <<" Exceeded population with the catch... "<< kludge<<" "<<C(i)<<" "<<N(1,i)<<endl; fcomp(6)+= 1e6*ffpen; }
-    N(1,i)               -= obs_catch_sex(1,i);                            // subtract off catch from remaining stock
-    N(2,i)               -= obs_catch_sex(2,i);                            // subtract off catch from remaining stock
-    pred_tags_sex(1,i)   = Tags(1,i-1)*ERtmp(1)*mfexp(-ndays(i)*M/365.);  // predicted tags a function of ER and previous tag numbers
-    Tags(1,i)            = Tags(1,i-1) - pred_tags_sex(1,i);           // subtract off catch from remaining stock
-    pred_tags_sex(2,i)   = Tags(2,i-1)*ERtmp(2)*mfexp(-ndays(i)*M/365.);  // predicted tags a function of ER and previous tag numbers
-    Tags(2,i)            = Tags(2,i-1) - pred_tags_sex(2,i);           // subtract off catch from remaining stock
+    N(1,i)               -= obs_catch_sex(1,i);                           // subtract off catch from remaining stock
+    N(2,i)               -= obs_catch_sex(2,i);                           // subtract off catch from remaining stock
+    pred_tags_sex(1,i)   = Tags(1,i-1)*ERtmp(1)*Stmp;  // predicted tags a function of ER and previous tag numbers
+    pred_tags_sex(2,i)   = Tags(2,i-1)*ERtmp(2)*Stmp;  // predicted tags a function of ER and previous tag numbers
+    Tags(1,i)            = Tags(1,i-1)*Stmp - pred_tags_sex(1,i);              // subtract off catch from remaining stock
+    Tags(2,i)            = Tags(2,i-1)*Stmp - pred_tags_sex(2,i);              // subtract off catch from remaining stock
     pred_tags_sex(1,i) *= repr(i);
     pred_tags_sex(2,i) *= repr(i);
   }
@@ -254,41 +258,39 @@ REPORT_SECTION
   }
   
 FUNCTION set_output
+  dvector nRepRate(1,2);
+  dvariable MeanN = 0;
+  double cumdays  = 0;
+  double sumcatch = 0;
+  double ntmp     = 0;
+  nRepRate.initialize();
+  RepRate.initialize();
+  for (int i=1;i<=n_events;i++)
   {
-    dvector nRepRate(1,2);
-    dvariable MeanN = 0;
-    double cumdays  = 0;
-    double sumcatch = 0;
-    double ntmp     = 0;
-    nRepRate.initialize();
-    RepRate.initialize();
-    for (int i=1;i<=n_events;i++)
+    cumdays += ndays(i);
+    if (cumdays < 365)
     {
-      cumdays += ndays(i);
-      if (cumdays < 360)
-      {
-        MeanN += N(1,i);
-        MeanN += N(2,i);
-        ntmp++;
-        sumcatch += C(i);
-      }
-      RepRate(repindex(i)) += repr(i);
-      nRepRate(repindex(i))++;
+      MeanN += N(1,i);
+      MeanN += N(2,i);
+      ntmp++;
+      sumcatch += C(i);
     }
-    MeanN /= ntmp;
-    RepRate = elem_div(RepRate,nRepRate);
-    Biomass = sum(Ninit)*MeanWt;
-    ER      = sumcatch/MeanN;
+    RepRate(repindex(i)) += repr(i);
+    nRepRate(repindex(i))++;
   }
+  MeanN /= ntmp;
+  RepRate = elem_div(RepRate,nRepRate);
+  Biomass = sum(Ninit)*MeanWt;
+  ER      = sumcatch/MeanN;
   if(mceval_phase())
   {
     if (mcflag)
     {
-      mcout<<Biomass<<" "<< Ninit<<" "<<ploss<<" "<<RepRate<<" "<<M<<" "<<ER<<" "<<surv<<" "<<f<<" "<<fcomp<<endl;
+      mcout<<Biomass<<" "<< Ninit<<" "<<ploss<<" "<<RepRate<<" "<<M<<" "<<ER<<" "<<surv<<" "<<MeanN/(1e6*sum(Ninit))<<" "<< f<<" "<<fcomp<<endl;
     }
     else
     {
-      mcout<<"Biom N_male N_female  p_loss  Rep_Rate_F  Rep_Rate_SF M ER  Survival  ObjFun  ObjF_Tags ObjF_Repr ObjF_M x x"<<endl;
+      mcout<<"Biom N_male N_female  p_loss  Rep_Rate_F  Rep_Rate_SF M ER  Survival  Net_Movement ObjFun  ObjF_Tags ObjF_Repr ObjF_M x x"<<endl;
       mcflag=1;
     }
   }
