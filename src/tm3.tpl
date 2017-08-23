@@ -44,13 +44,9 @@
   !! COUT(prop_double_tagged);
   init_vector surv_data(1,2);
   !! COUT(surv_data);
-   init_int n_fsh_rr_obs;
-  !! COUT(n_fsh_rr_obs);
-   init_int n_cht_rr_obs;
-  !! COUT(n_cht_rr_obs);
-  init_matrix fsh_rr_obs(1,n_fsh_rr_obs,1,2);
+  init_vector fsh_rr_obs(1,2);
   !! COUT(fsh_rr_obs);
-  init_matrix cht_rr_obs(1,n_cht_rr_obs,1,2);
+  init_vector cht_rr_obs(1,2);
   !! COUT(cht_rr_obs);
   init_int icheck;
   !! COUT(icheck);
@@ -142,12 +138,13 @@ PARAMETER_SECTION
   init_number lnM(M_phase);
   init_bounded_number ploss(0,1);
   init_bounded_number surv(0,1,2);
-  init_bounded_vector fsh_repr(1,n_events,0.05,1,1);
-  init_bounded_vector cht_repr(1,n_events,0.05,1,1);
+  init_bounded_number fsh_repr(0.05,1,1);
+  init_bounded_number cht_repr(0.05,1,1);
   number prob_no_tag;
   vector N(0,n_events);
   vector Tags(0,n_events);
   vector pred_tags(1,n_events);
+  vector repr(1,n_events);
   vector Ntot_Peterson(1,n_events);
   number ER;
   number ffpen
@@ -175,14 +172,8 @@ PROCEDURE_SECTION
 
   if(mceval_phase()|sd_phase())
   {
-    dvector nRepRate(1,2);
-    nRepRate.initialize();
-    for (int i=1;i<=n_events;i++)
-    {
-      RepRate(repindex(i)) += repr(i);
-      nRepRate(repindex(i))++;
-    }
-    RepRate = elem_div(RepRate,nRepRate);
+    RepRate(1) += fsh_repr;
+    RepRate(2) += cht_repr;
     Biomass = Ninit*MeanWt;
     ER      = sum(C)/mean(N);
   }
@@ -216,15 +207,18 @@ FUNCTION void get_likelihoods()
   int i,tloc,kk,irf;
   for (i=1; i<=n_events; i++)
   {
+    if (repindex(i) == 1)
+      repr(i) = fsh_repr;
+    else
+      repr(i) = cht_repr;
+
     pred_tags(i) *= repr(i);
     // cout<< pred_tags(i,tloc,loc)<<" "<<obs_tags(i,tloc,loc)<<" "<<log(pred_tags(i,tloc,loc));
     fcomp(1)     += pred_tags(i)-(obs_tags(i)*log(pred_tags(i)));
   }
-  for (i=1; i<=n_fsh_rr_obs; i++)
-  {
-    pred_tags(i) *= repr(i);
-    fcomp(2)     -= (fsh_rr_obs(i,1)*log(repr(i))) + (fsh_rr_obs(i,2)*(log(1.-repr(i))));
-  }
+  fcomp(2) -= (fsh_rr_obs(2)*log(fsh_repr)) + (fsh_rr_obs(1)-fsh_rr_obs(2))*log(1.-fsh_repr);
+  fcomp(2) -= (cht_rr_obs(2)*log(cht_repr)) + (cht_rr_obs(1)-cht_rr_obs(2))*log(1.-cht_repr);
+  
   fcomp(2) -= (one*log(2.*ploss*(1.-ploss)) + two*(log((1.-ploss)*(1.-ploss))));
   fcomp(2) -= (surv_data(1)*log(surv))+ (surv_data(2)*log(1.-surv));
   /*
