@@ -25,18 +25,35 @@
   !! lambda_M = 1/(2.*M_cv*M_cv);
   init_number MeanWt;
   init_int n_events
+  !! COUT(n_events);
   init_number T;
+  !! COUT(T);
   init_vector C(1,n_events);
+  !! COUT(C);
   init_vector obs_tags(1,n_events);
+  !! COUT(obs_tags);
   init_ivector repindex(1,n_events);
+  !! COUT(repindex);
   init_vector ndays(1,n_events);
+  !! COUT(ndays);
   init_number two // # double tag recovered with two tags
+  !! COUT(two ); // # double tag recovered with two tags
   init_number one // # double tag recovered with only one tag
+  !! COUT(one ); // # double tag recovered with two tags
   init_number prop_double_tagged;
+  !! COUT(prop_double_tagged);
   init_vector surv_data(1,2);
-  // init_int nrep_obs;
-  init_matrix rep_obs(1,n_events,1,2);
+  !! COUT(surv_data);
+   init_int n_fsh_rr_obs;
+  !! COUT(n_fsh_rr_obs);
+   init_int n_cht_rr_obs;
+  !! COUT(n_cht_rr_obs);
+  init_matrix fsh_rr_obs(1,n_fsh_rr_obs,1,2);
+  !! COUT(fsh_rr_obs);
+  init_matrix cht_rr_obs(1,n_cht_rr_obs,1,2);
+  !! COUT(cht_rr_obs);
   init_int icheck;
+  !! COUT(icheck);
   // init_int num_events;
   // init_int nsim_days;
   // init_matrix sim_dat(1,num_events,1,4);
@@ -125,7 +142,8 @@ PARAMETER_SECTION
   init_number lnM(M_phase);
   init_bounded_number ploss(0,1);
   init_bounded_number surv(0,1,2);
-  init_bounded_vector repr(1,n_events,0.05,1,1);
+  init_bounded_vector fsh_repr(1,n_events,0.05,1,1);
+  init_bounded_vector cht_repr(1,n_events,0.05,1,1);
   number prob_no_tag;
   vector N(0,n_events);
   vector Tags(0,n_events);
@@ -201,8 +219,11 @@ FUNCTION void get_likelihoods()
     pred_tags(i) *= repr(i);
     // cout<< pred_tags(i,tloc,loc)<<" "<<obs_tags(i,tloc,loc)<<" "<<log(pred_tags(i,tloc,loc));
     fcomp(1)     += pred_tags(i)-(obs_tags(i)*log(pred_tags(i)));
-    fcomp(2)     -= (rep_obs(i,1)*log(repr(i))) +
-                    (rep_obs(i,2)*(log(1.-repr(i))));
+  }
+  for (i=1; i<=n_fsh_rr_obs; i++)
+  {
+    pred_tags(i) *= repr(i);
+    fcomp(2)     -= (fsh_rr_obs(i,1)*log(repr(i))) + (fsh_rr_obs(i,2)*(log(1.-repr(i))));
   }
   fcomp(2) -= (one*log(2.*ploss*(1.-ploss)) + two*(log((1.-ploss)*(1.-ploss))));
   fcomp(2) -= (surv_data(1)*log(surv))+ (surv_data(2)*log(1.-surv));
@@ -308,3 +329,13 @@ REPORT_SECTION
 
 
   */
+GLOBALS_SECTION
+	/**
+	 * \def COUT(object)
+	 * Prints object to screen during runtime.
+	 * cout <<setw(6) << setprecision(3) << setfixed() << x << endl;
+	**/
+	#undef COUT
+	#define COUT(object) cout << #object "\n" << setw(6) \
+	 << setprecision(3) << setfixed() << object << endl;
+
