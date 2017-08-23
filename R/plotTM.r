@@ -2,6 +2,38 @@ getwd()
 setwd("R")
 system("../src/run.bat pet_all")
 source("read.admb.R")
+?read.table
+mc=read.table("../src/arc/pet_all_s2_mcout.rep",skip=1,header=F)
+mc=read.table("../src/arc/pet_all_mcout.rep",skip=1,header=F)
+colnames(mc)=c("B","N","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
+plot(density(mc$B),xlim=c(0,800),xlab="Biomass")
+mc=read.table("../src/arc/seg_all_mcout.rep",skip=1,header=F)
+mc=read.table("../src/arc/tan_all_mcout.rep",skip=1,header=F)
+mc=read.table("../src/arc/pet_011_mcout.rep",skip=1,header=F)
+mc=read.table("../src/arc/seg_011_mcout.rep",skip=1,header=F)
+mc=read.table("../src/arc/tan_011_mcout.rep",skip=1,header=F)
+.MyPlot("../src/arc/pet_all_mcout.rep")
+.MyLines("../src/arc/pet_011_mcout.rep",col="green")
+.MyLines("../src/arc/pet_all_s3_mcout.rep",col="red")
+b
+.MyPlot <- function( repObj = "../src/arc/tan_011_mcout.rep",xlim=c(0,700),main="Biomass"){
+  mc=read.table(repObj,skip=1,header=F)
+  colnames(mc)=c("B","N","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
+  plot(density(mc$B),xlim=xlim,main=main,xlab="Biomass")
+}
+
+.MyLines <- function( repObj = "../src/arc/tan_011_mcout.rep",col=1,lty=1,lwd=1 ){
+  mc=read.table(repObj,skip=1,header=F)
+  colnames(mc)=c("B","N","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
+  lines(density(mc$B),lty=lty,lwd=lwd,col=col)
+}
+
+quantile(mc$B,.8)
+lines(density(mc$B),lty=1,lwd=2,col="red")
+density(mc$B)
+names(mc)
+dim(mc)
+
 p_all=read.rep("../src/arc/pet_all.rep")
 p_alls1=read.rep("../src/arc/pet_all_s1.rep")
 p_alls2=read.rep("../src/arc/pet_all_s2.rep")
