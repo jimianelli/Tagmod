@@ -1,79 +1,139 @@
+R
+source("read.admb.R")
+library(tidyverse)
+library(ggplot2)
+library(GGally)
+library(ggridges,quietly=TRUE)
+setwd("~/Google Drive/Atka tag model/2018 tag model/Main/runs")
+mytheme <- theme(panel.grid.major.x = element_blank(), panel.grid.minor.y = element_blank(), panel.grid.major.y = element_blank() )
+mytheme <- mytheme + theme(text=element_text(size=18)) + theme(axis.title.x=element_text(size=24) ,axis.title.y=element_text(size=24))
+mytheme <- mytheme + theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),panel.grid.minor.y = element_line(colour="grey60", linetype="dashed"), panel.grid.major.y = element_blank() )
+mytheme <- mytheme + theme( panel.background = element_rect(fill="white"), panel.border = element_rect(colour="black", fill=NA, size=1))
+
+#----Immigration (recruitment) factor estimated ------------------------
+mc4 <- read.table("results/both_mcmc.rep",header=T,row.names=NULL)
+mc1 <- read.table("results/both_mcmc.rep",header=T,row.names=NULL)
+mc2 <- read.table("results/nearshore_mcmc.rep",header=T,row.names=NULL)
+mc3 <- read.table("results/Seamounts_mcmc.rep",header=T,row.names=NULL)
+mc4$Biomass <- mc2$Biomass + mc3$Biomass
+mc <- rbind(mc1,mc2,mc3,mc4)
+#mc$trial <- c(rep('543 Combined',4999),rep('543 Nearshore',4999),rep('543 Seamounts',4999),rep('541 Seguam',4999))
+mc$Area <- c(rep('543 Combined',4999),rep('543 Nearshore',4999),rep('543 Seamounts',4999),rep('Nearshore+Seamounts',4999))
+ggplot(mc,aes(x=Biomass,fill = Area)) + geom_density(alpha=0.5) + mytheme + xlim(c(0,1000))  + xlab("Biomass (kt)") + ggtitle("Immigration estimated")
+
+#----Immigration (recruitment) factor fixed at 1.0----------------------
+mc <- read.table("results/both_no_RF_mcmc.rep",header=T,row.names=NULL)
+mc <- rbind(mc,read.table("results/nearshore_no_RF_mcmc.rep",header=T,row.names=NULL))
+mc <- rbind(mc,read.table("results/seamounts_no_RF_mcmc.rep",header=T,row.names=NULL))
+#mc$trial <- c(rep('543 Combined',4999),rep('543 Nearshore',4999),rep('543 Seamounts',4999),rep('541 Seguam',4999))
+mc$Area <- c(rep('543 Combined',4999),rep('543 Nearshore',4999),rep('543 Seamounts',4999))
+ggplot(mc,aes(x=Biomass,fill = Area)) + geom_density(alpha=0.5) + mytheme + xlim(c(0,1000))  + xlab("Biomass (kt)") + ggtitle("No immigration estimated") +  scale_y_continuous(breaks=NULL)
+#theme(axis.title.y=element_blank())
+#----Seguam sensitivities ---------------------------------
+mcp <- data.frame(read.table("results/Seguam_M_mcmc.rep",header=T,row.names=NULL))[,c(1,3:6,16)] %>% sample_n(2000) 
+ggpairs(mcp,aes(color="blue",alpha=.3))
+names(mc)
+
+#mc <- read.table("res_seguam_sensitivity/Seguam_no_RF_mcmc.rep",header=T,row.names=NULL)
+#mc <- rbind(mc,read.table("res_seguam_sensitivity/Seguam_mcmc.rep",header=T,row.names=NULL))
+#mc <- rbind(mc,read.table("res_seguam_sensitivity/Seguam_M_mcmc.rep",header=T,row.names=NULL))
+#mc <- rbind(mc,read.table("res_seguam_sensitivity/Seguam_no_RF_M_mcmc.rep",header=T,row.names=NULL))
+#mc <- read.table("results/Seguam_no_RF_mcmc.rep",header=T,row.names=NULL)
+#mc <- rbind(mc,read.table("results/Seguam_mcmc.rep",header=T,row.names=NULL))
+#mc <- rbind(mc,read.table("results/Seguam_M_mcmc.rep",header=T,row.names=NULL))
+#mc <- rbind(mc,read.table("results/Seguam_no_RF_M_mcmc.rep",header=T,row.names=NULL))
+##mc$trial <- c(rep('543 Combined',4999),rep('543 Nearshore',4999),rep('543 Seamounts',4999),rep('541 Seguam',4999))
+##mc$Area <- c(rep('543 Combined',4999),rep('543 Nearshore',4999),rep('543 Seamounts',4999))
+##mc$Model <- c(rep('No immig.',4999), rep('Immig. est.',4999), rep('Immig. est., CV M 0.25',4999), rep('No immig., CV M 0.25',4999) )
+#mc$Model <- c(rep('C',4999),
+#	rep('I',4999),
+#	rep('IM',4999),
+#	rep('M',4999)
+#	)
+mc <- read.table("results/Seguam_mcmc.rep",header=T,row.names=NULL)
+#mc <- read.table("results/Seguam1_mcmc.rep",header=T,row.names=NULL)
+#mc1 <- read.table("results/Seguam1b_mcmc.rep",header=T,row.names=NULL)
+mc1 <- read.table("results/Seguam1_mcmc.rep",header=T,row.names=NULL)
+mc34 <- read.table("results/Seguam34_mcmc.rep",header=T,row.names=NULL)
+#mc2 <- mc1
+#mc2$Biomass <- mc1$Biomass / mc34$Biomass
+#ggplot(mc2,aes(x=Biomass)) + geom_density(alpha=0.5,fill="salmon") + mytheme + xlim(c(0,3))  + xlab("Area 1 biomass / areas 3&4 biomass") + ggtitle("Seguam area")+ geom_vline(xintercept = 1.)
+#ggplot(mc2,aes(x=Biomass)) + stat_ecdf(size=2,color="salmon") + mytheme + xlim(c(0,2))  + xlab("Area 1 biomass / areas 3&4 biomass") + ylab("Probability")+ ggtitle("Seguam area") + geom_vline(xintercept = 1.)
+#mc <- rbind(mc,mc2,mc3,mc1)
+mc <- rbind(mc,mc2,mc34)
+mc$Model <- c(rep('All strata',4999),
+	rep('Stratum 1',4999),
+	rep('Strata 3 & 4',4999))
+mc$Model <- c(rep('Seguam all strata',4999),
+	rep('Seguam strata 3 & 4',4999),
+	rep('All - (3+4) ',4999),
+	rep('Seguam strata 1 ',4999))
+#mc$Area <- c(rep('Seguam no immigration',4999))
+mcp <- sample_n(mc,2000)[,c(1,3:6,17)]
+ggpairs(mcp,aes(color=Model,alpha=.2))
+ggplot(mc,aes(x=Biomass,fill = Model)) + geom_density(alpha=0.5) + mytheme + xlim(c(0,1000))  + xlab("Biomass (kt)") + ggtitle("Seguam area")
+ggplot(mc,aes(x=Biomass,color = Model)) + stat_ecdf(size=2) + mytheme + xlim(c(0,1000))  + xlab("Biomass (kt)") + ggtitle("Seguam area")
+stat_ecdf()
+mapping = NULL, data = NULL, geom = "step",
+  position = "identity", ..., n = NULL, pad = TRUE, na.rm = FALSE,
+  show.legend = NA, inherit.aes = TRUE)
+
+#----updated datafiles------------------------
+#----updated datafiles------------------------
+mc <- read.table("results/both2_mcmc.rep",header=T,row.names=NULL)
+mc <- rbind(mc,read.table("results/nearshore2_mcmc.rep",header=T,row.names=NULL))
+mc <- rbind(mc,read.table("results/seamounts2_mcmc.rep",header=T,row.names=NULL))
+mc <- rbind(mc,read.table("results/Seguam2_mcmc.rep",header=T,row.names=NULL))
+mc$trial <- c(rep('543 Combined',4999),rep('543 Nearshore',4999),rep('543 Seamounts',4999),rep('541 Seguam',4999))
+
+ggplot(mc,aes(x=Biomass,fill = trial)) + geom_density(alpha=0.5) + mytheme + xlim(c(0,1000))  + xlab("Biomass (kt)") + ggtitle("Up updated datafiles")
+
+
+ggplot(mc,aes(x=Biomass,fill = trial)) + geom_density(alpha=0.5) + mytheme + xlim(c(0,1000))  + xlab("Biomass (kt)")
+ggplot(mc,aes(x=N,fill = trial)) + geom_density() + mytheme + xlim(c(0,9500)) 
+ggplot(mc,aes(x=N,fill = trial)) + geom_density() + mytheme + xlim(c(0,5500)) 
+
+mc %>% filter(trial=="Seguam") %>%      sample_n(500) %>% select(1,3,4,5,6,7,8) %>% ggpairs() + mytheme
+mc %>% filter(trial=="Both") %>%      sample_n(500) %>% select(1,4,5,6,7) %>% ggpairs() + mytheme
+mc %>% filter(trial=="Seamounts") %>%      sample_n(500) %>% select(1,4,5,6,7) %>% ggpairs() + mytheme
+mc %>% filter(trial=="Nearshore") %>%      sample_n(500) %>% select(1,4,5,6,7) %>% ggpairs() + mytheme
+mc %>% filter(trial=="Nearshore") %>% sample_n(500) %>% select(1,3,4,5,6,7,8) %>% ggpairs() + mytheme
+mc %>% filter(trial=="Seamounts") %>% sample_n(500) %>% select(1,3,4,5,6,7,8) %>% ggpairs() + mytheme
+ggpairs(mc)
+stat = "identity",scale = 1, alpha = .3,
+p1  <- ggplot(mc,aes(x=age,y=as.factor(Year),height = sel)) + geom_density_ridges(stat = "identity",scale = 1, alpha = .3,
+  	     fill=fill,color="black") + .THEME +
+         xlim(c(1,lage))+ ylab("Year") + xlab("Age (years)") + scale_y_discrete(limits=rev(levels(as.factor(sdf$Year))))
+names(mc)
+
+
+
 getwd()
 setwd("R")
 system("../src/run.bat pet_all")
-source("read.admb.R")
-?read.table
 mc=read.table("../src/arc/pet_all_s2_mcout.rep",skip=1,header=F)
 mc=read.table("../src/arc/pet_all_mcout.rep",skip=1,header=F)
-names(mc)
-mc=read.table("../src/arc/seg_all_mcout.rep",skip=1,header=F)
-mc=read.table("../src/arc/pet_all_mcout.rep",skip=1,header=F)
-colnames(mc)=c("Biom","Nmale","NFemale","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x")
-plot(density(mc$ER))
+colnames(mc)=c("B","N","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
 plot(density(mc$B),xlim=c(0,800),xlab="Biomass")
-mcnames=1:10
-mcnames
-mcnames[1]="../src/arc/seg_all_mcout.rep"
-mcnames[2]="../src/arc/tan_all_mcout.rep"
-mcnames[3]="../src/arc/pet_all_mcout.rep"
-mcnames[2]="../src/arc/pet_all_s1_mcout.rep"
-mcnames[3]="../src/arc/pet_all_s2_mcout.rep"
-mcnames[4]="../src/arc/pet_all_s3_mcout.rep"
-mcnames[5]="../src/arc/pet_all_s4_mcout.rep"
-mcnames[6]="../src/arc/pet_all_s5_mcout.rep"
-mcnames[7]="../src/arc/pet_011_mcout.rep"
-mcnames[8]="../src/arc/tan_all_mcout.rep"
-mcnames[9]="../src/arc/tan_011_mcout.rep"
-mcnames[10]="../src/arc/seg_all_mcout.rep"
-mcnames[11]="../src/arc/seg_011_mcout.rep"
-mcnames[12]="../src/arc/seg_all_s1_mcout.rep"
-mcnames[13]="../src/arc/seg_all_s2_mcout.rep"
-mcnames[14]="../src/arc/seg_all_s3_mcout.rep"
-mcnames[15]="../src/arc/seg_all_s4_mcout.rep"
-mcnames[16]="../src/arc/seg_all_s5_mcout.rep"
-
-.MyPlot(mcnames[1],xlim=c(0,550))
-.MyLines(mcnames[2] ,col="green")
-.MyLines(mcnames[3] ,col="red")
-.MyLines(mcnames[4] ,col="green")
-.MyLines(mcnames[5] ,col="red")
-.MyLines(mcnames[6] ,col="red",lty=2,lwd=3)
-.MyLines(mcnames[7] ,col="red",lty=2,lwd=1)
-
-.MyLines(mcnames[8] ,col="red",lty=2,lwd=3)
-.MyLines(mcnames[9] ,col="red",lty=2,lwd=1)
-
-.MyPlot2(mcnames[1])
-.MyPlot2(mcnames[2])
-.MyPlot2(mcnames[3])
-.MyPlot(mcnames[10])
-.MyLines(mcnames[11])
-.MyLines(mcnames[12] ,col="green")
-.MyLines(mcnames[13] ,col="red")
-.MyLines(mcnames[14] ,col="green")
-.MyLines(mcnames[15] ,col="red")
-.MyLines(mcnames[16] ,col="red",lty=2,lwd=3)
-
-
-
-
-.MyPlot2 <- function( repObj = "../src/arc/tan_011_mcout.rep",xlim=c(0,.2),main="Exploitation rate"){
-  mc=read.table(repObj,skip=1,header=F)
-  colnames(mc)=c("B","Nmales","NFemale","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
-  plot(density(mc$ER),xlim=xlim,main=main,xlab="Exploitation rate")
-}
-
+mc=read.table("../src/arc/seg_all_mcout.rep",skip=1,header=F)
+mc=read.table("../src/arc/tan_all_mcout.rep",skip=1,header=F)
+mc=read.table("../src/arc/pet_011_mcout.rep",skip=1,header=F)
+mc=read.table("../src/arc/seg_011_mcout.rep",skip=1,header=F)
+mc=read.table("../src/arc/tan_011_mcout.rep",skip=1,header=F)
+.MyPlot("../src/arc/pet_all_mcout.rep")
+.MyLines("../src/arc/pet_011_mcout.rep",col="green")
+.MyLines("../src/arc/pet_all_s3_mcout.rep",col="red")
+b
 .MyPlot <- function( repObj = "../src/arc/tan_011_mcout.rep",xlim=c(0,700),main="Biomass"){
   mc=read.table(repObj,skip=1,header=F)
-  colnames(mc)=c("B","Nmales","NFemale","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
+  colnames(mc)=c("B","N","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
   plot(density(mc$B),xlim=xlim,main=main,xlab="Biomass")
 }
 
 .MyLines <- function( repObj = "../src/arc/tan_011_mcout.rep",col=1,lty=1,lwd=1 ){
   mc=read.table(repObj,skip=1,header=F)
+  colnames(mc)=c("B","N","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
   lines(density(mc$B),lty=lty,lwd=lwd,col=col)
-  colnames(mc)=c("B","Nmales","NFemale","p_loss","Rep_Rate_F","Ref_Rate_SF","M","ER","Survival","ObjFun","ObjF_Tags","ObjF_Repr","ObjF_M","x","x","x")
-  # print(density(mc$B)) print(density(mc$B)$x) print(density(mc$B)$y) names(density(mc$B))
 }
 
 quantile(mc$B,.8)

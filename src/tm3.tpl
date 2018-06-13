@@ -286,11 +286,11 @@ FUNCTION set_output
   {
     if (mcflag)
     {
-      mcout<<Biomass<<" "<< Ninit<<" "<<ploss<<" "<<RepRate<<" "<<M<<" "<<ER<<" "<<surv<<" "<<MeanN/(1e6*sum(Ninit))<<" "<< f<<" "<<fcomp<<endl;
+      mcout<<Biomass<<" "<< Ninit<<" "<<ploss<<" "<<RepRate<<" "<<M<<" "<<ER<<" "<<surv<<" "<<MeanN/(1e6*sum(Ninit))<<" "<< f<<" "<<fcomp<<" "<<RF<<endl;
     }
     else
     {
-      mcout<<"Biom N_male N_female  p_loss  Rep_Rate_F  Rep_Rate_SF M ER  Survival  Net_Movement ObjFun  ObjF_Tags ObjF_Repr ObjF_M x x"<<endl;
+      mcout<<"Biom N_male N_female  p_loss  Rep_Rate_F  Rep_Rate_SF M ER  Survival  Net_Movement ObjFun  ObjF_Tags ObjF_Repr ObjF_M x x x x "<<endl;
       mcflag=1;
     }
   }
@@ -342,3 +342,4 @@ GLOBALS_SECTION
    ofstream echoinput("echoinput.rep");
    ofstream checkfile("checkfile.rep");
    ofstream mcout("mcout.rep");
+
