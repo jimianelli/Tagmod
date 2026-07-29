@@ -1,0 +1,78 @@
+#This file is space-delimited
+#This file is combination of 4 areas: Tahoma Seamount, Tahoma Reef, Walls Plateau, Heck Canyon; combined the charter tag recoveries and fishery for both
+#No stratum (assuming all combined)
+#little to no fishery occurred during 2015-2016 (543 was closed in 2014)
+#in general, columns (when shown) reflect inside/outside TEZs
+#this file ONLY includes tags with no movement; recoveries and releases from same respective areas.
+# Natural mortality
+# Mean   CV  Phase(neg turns off)
+  0.3   0.05    3
+# RF Mean   CV  Phase(neg turns off)
+  1.16   0.05    4
+# Average weight of released Atkas
+ 0.653
+#the count of recovery events
+10
+# tagged fish, includes double tagged fish.
+14376
+#fish examined for tags; rows = recovery events; column = no inside/outside
+#recovery events (time periods): fishery 1, fishery 2, charter 3, fishery 4, fishery 5, charter 6, fishery 7, fishery 8, fishery 9, fishery 10
+#Atka examined during events 1, 2 and 4 is from POP fishing only; area 543was closed to Atka fishing (2014) no heck canyon
+1
+225023
+1820497
+1
+4558901
+2093888
+1319828
+2396088
+3249917
+9460935
+#tag recoveries; rows = recovery events (no inside/outside); tag recoveries include double tagged fish
+0
+0
+47
+0
+60
+33
+30
+33
+19
+52
+#report rate codes; rows = recovery events; 1=fishery and 2=charter
+1
+1
+2
+1
+1
+2
+1
+1
+1
+1
+#days between events; rows = recovery events; first row is # of days from mid tagging cruise to mid first recovery event
+#the repeat at time periods (TP) 3/4 and 6/7 is charter and the fishery recoveries that occur at the same time as charter
+0	#	1
+67	#	68
+77	#	145
+0	#	145
+128	#	273
+53	#	326
+0	#	326
+74	#	400
+90	#	490
+213	#	703
+# tag retention; area specific; columns = # double tagged fish recovered w/both tags, # of double tagged fish recovered with only 1 tag; includes charter/fishery combined
+#includes tagged fish released/recovered all of area 543 (Buldir E, W, Ing Rock, Tah reef/seamount, Heck, etc.).
+163 35
+#proportion double-tagged; area specific (although its almost always the same)
+0.24
+#mortality experiments (same for all files), 2014 only; columns = the # of fish survived, # of fish that died
+189 22
+#number of reporting rate trials; these are seeded tag trials (vessel=trial); columns = fishery, charter
+# Fishery
+1909	1493
+# charter
+1890	1808
+# icheck
+12345
