@@ -1,0 +1,77 @@
+#This file is space-delimited
+#This file is Seguam, all stratum combined (1, 3, and 4); combined the 2 charter tag recoveries and combined
+#the no of fish examined and tags fishery for stratums 3/4
+#No stratum (assuming all combined)
+#no fishery occurred in stratum 3 in 2014; was still closed to the fishery
+#in general, columns (when shown) reflect inside/outside TEZs
+#this file ONLY includes tags with no movement; recoveries and releases from same respective areas.
+# Mean   CV  Phase(neg turns off)
+  0.3   0.25    3
+# RF_mu RF_cv  Phase RF
+	2.07  0.05  4
+# Average weight of released Atkas
+0.757269588066506
+#the count of recovery events
+10
+# tagged fish, includes double tagged fish; stratum 1,3, and 4 combined.
+6411
+#fish examined for tags; rows = recovery events; column = no inside/outside
+#recovery events (time periods): fishery 1, fishery 2, charter 3, fishery 4, fishery 5, charter 6, fishery 7, fishery 8, fishery 9, fishery 10
+#Atka examined during events 1, 2 and 4 is from POP fishing only; area 543was closed to Atka fishing (2014)
+1 # 25780
+11004906
+1097388
+7505146
+14551004
+1016127
+811648
+6854246
+13229036
+23976675
+#tag recoveries; rows = recovery events (no inside/outside); tag recoveries include double tagged fish
+0
+92
+6
+26
+67
+7
+5
+29
+43
+32
+#report rate codes; rows = recovery events; 1=fishery and 2=charter
+1
+1
+2
+1
+1
+2
+1
+1
+1
+1
+#days between events; rows = recovery events; first row is # of days from mid tagging cruise to mid first recovery event
+#the repeat at time periods (TP) 3/4 and 6/7 is charter and the fishery recoveries that occur at the same time as charter
+0	#	1
+67	#	68
+77	#	145
+0	#	145
+128	#	273
+53	#	326
+0	#	326
+74	#	400
+90	#	490
+213	#	703
+# tag retention; area specific; columns = # double tagged fish recovered w/both tags, # of double tagged fish recovered with only 1 tag; includes charter/fishery combined
+#includes only tagged fish released/recovered at Seguam, all stratum combined (does not include large area movement, if any).
+163 35
+#proportion double-tagged; area specific (although its almost always the same)
+0.24
+#mortality experiments (same for all files), 2014 only; columns = the # of fish survived, # of fish that died
+189 22
+# Fishery
+1909	1493
+# charter
+1890	1808
+# icheck
+12345

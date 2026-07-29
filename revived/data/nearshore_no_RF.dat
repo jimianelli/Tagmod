@@ -1,0 +1,87 @@
+# this file is space-delimited
+#This file is combination of 3 areas: Agattu,Buldir E, Buldir W, and Ingenstrom Rock combined the charter tag recoveries and fishery for both
+#No stratum (assuming all combined)
+#little to no fishery occurred during 2015-2016 (543 was closed in 2014)
+#in general, columns (when shown) reflect inside/outside TEZs
+#this file ONLY includes tags with no movement; recoveries and releases from same respective areas.
+#none of this data is parsed out by sex.
+# Natural mortality
+# Mean   CV  Phase(neg turns off)
+  0.3   0.05    3
+# RF_mu RF_cv  Phase RF
+	1.0  0.10 -4
+# Average weight of released Atkas
+0.600587942200176
+#the count of recovery events
+10
+#tagged fish, includes double tagged fish
+10605
+#fish examined for tags; rows = recovery events; column = no inside/outside
+#recovery events (time periods): fishery 1, fishery 2, charter 3, fishery 4, fishery 5, charter 6, fishery 7, fishery 8, fishery 9, fishery 10
+#Atka examined during events 1, 2 and 4 is from POP fishing only; area 543was closed to Atka fishing (2014)
+1 #63865.00
+5950.00
+1330938.00
+1 ##0
+3226839.00
+1184110.00
+1001005.00
+1910414.00
+3107919.00
+6724635.00
+#tag recoveries; rows = recovery events (no inside/outside); tag recoveries include double tagged fish
+0.00
+0.00
+42.00
+0
+55.00
+29.00
+29.00
+30.00
+19.00
+46.00
+#report rate codes; rows = recovery events; 1=fishery and 2=charter
+1.00
+1.00
+2.00
+1
+1.00
+2.00
+1.00
+1.00
+1.00
+1.00
+
+#days between events; rows = recovery events; first row is # of days from mid tagging cruise to mid first recovery event
+#the repeat at time periods (TP) 3/4 and 6/7 is charter and the fishery recoveries that occur at the same time as charter
+0	#	1
+67	#	68
+77	#	145
+0	#	145
+128	#	273
+53	#	326
+0	#	326
+74	#	400
+90	#	490
+213	#	703
+# tag retention; area specific; columns = # double tagged fish recovered w/both tags, # of double tagged fish recovered with only 1 tag; includes charter/fishery combined
+#includes tagged fish released/recovered all of area 543 (Buldir E, W, Ing Rock, Tah reef/seamount, Heck, etc.).
+#81 10
+163 35
+#proportion double-tagged; area specific (although it's almost always the same)
+0.24
+#mortality experiments (same for all files), 2014 only; columns = the # of fish survived, # of fish that died
+189 22
+#number of reporting rate trials; these are seeded tag trials (vessel=trial); columns = fishery, charter
+# 43313
+#reporting rate data; rows=vessels (fishery first, charter is the last row);
+#columns = # seeded tags reported, # seeded tags not recovered; single tags only, does not include double tags
+#is not area specific or time period specific, includes seeded tags from any area during the fishery
+#in order, fish
+# Fishery
+#230 142
+1909	1493
+# charter
+1890	1808
+# icheck
+12345

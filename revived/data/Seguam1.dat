@@ -1,0 +1,81 @@
+#This file is space-delimited
+#This file is Seguam, stratum 1 = inside (charter only) and stratums 3/4 is outside; all years (2014, 2015 and 2016).
+#stratum 1 was closed the entire period, only charter occurred inside.
+#no fishery occurred in stratum 3 in 2014.
+#columns reflect inside/outside TEZs; in this file inside=stratum 1, outside=stratum 3/4, all years.
+#this file ONLY includes tags recovered at Seguam;
+# Mean   CV  Phase(neg turns off)
+  0.3   0.05    3
+# RF_mu RF_cv  Phase RF
+	1.99 0.05  4
+# Average weight of released Atkas
+0.757269588066506
+#the count of recovery events
+10
+# tagged fish, includes double tagged fish; columns=inside (1st)/outside (2nd)
+2135
+#fish examined for tags; rows = recovery events; column = inside (1st)/outside (2nd); inside (1) is charter only;
+#no. fish examined in stratums 3/4 (outside)
+#recovery events (time periods): fishery 1, fishery 2, charter 3, fishery 4, fishery 5, charter 6, fishery 7, fishery 8, fishery 9, fishery 10
+#Atka examined during events 1, 2 and 4 is from POP fishing only; area 543 was closed to Atka fishing (2014)
+1
+1
+570483
+1
+1
+570948
+1
+1
+1
+1
+
+#tag recoveries; rows = recovery events; tag recoveries include double tagged fish
+#columns = rel in/rec in, rel in/rec out, rel out/ rec in, rel out/rec out
+#inside=stratum 1 and outside=stratums 3, 4
+0
+0
+2
+0
+0
+2
+0
+0
+0
+0
+
+#report rate codes; rows = recovery events; 1=fishery and 2=charter; columns=inside (1st)/outside (2nd)
+1
+1
+2
+1
+1
+2
+1
+1
+1
+1
+#days between events; rows = recovery events; first row is # of days from mid tagging cruise to mid first recovery event
+#the repeat at time periods (TP) 3/4 and 6/7 is charter and the fishery recoveries that occur at the same time as charter
+0	#	1
+67	#	68
+77	#	145
+0	#	145
+128	#	273
+53	#	326
+0	#	326
+74	#	400
+90	#	490
+213	#	703
+# tag retention; area specific; columns = # double tagged fish recovered w/both tags, # of double tagged fish recovered with only 1 tag; includes charter/fishery combined
+#includes only tagged fish released/recovered at Seguam, all stratum combined (does not include large area movement, if any).
+163 35
+#proportion double-tagged; area specific (although its almost always the same)
+0.24
+#mortality experiments (same for all files), 2014 only; columns = the # of fish survived, # of fish that died
+189 22
+# Fishery
+1909	1493
+# charter
+1890	1808
+# icheck
+12345
