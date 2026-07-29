@@ -20,3 +20,9 @@
 *.out
 *.app
 /data/tan_2011.dat
+
+# Revived model build and generated run products
+/revived/src/tm
+/revived/src/tm.cpp
+/revived/src/tm.htp
+/revived/runs/generated/
